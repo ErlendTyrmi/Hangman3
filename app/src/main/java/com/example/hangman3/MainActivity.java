@@ -1,0 +1,273 @@
+package com.example.hangman3;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.Layout;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.example.hangman3.logic.Game;
+import com.example.hangman3.logic.GameInterface;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.concurrent.Executor;
+
+public class MainActivity extends AppCompatActivity implements ScoreFragment.OnFragmentInteractionListener {
+    private GameInterface game = new Game();
+    private ImageButton toggleScoreBoard;
+    private ImageView gameImage;
+    private TextView secretWord, wrongLetters;
+    private EditText enterText, textViewScoreNumber, textViewStreakNumber, textViewHighScoreNumber;
+    private DrawerLayout scoreBoardDrawer;
+    private Executor executor;
+    private final String dataFileName = "gameData.txt";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // View elements
+        secretWord = this.findViewById(R.id.secretWord);
+        gameImage = this.findViewById(R.id.gameImage);
+        enterText = this.findViewById(R.id.enterText);
+        wrongLetters = this.findViewById(R.id.wrongLetters);
+        toggleScoreBoard = this.findViewById(R.id.toggleScoreBoard);
+        // Confusing: is not a drawer, but children can be drawers
+        scoreBoardDrawer = this.findViewById(R.id.scoreBoardDrawerLayout);
+
+        executor = new ThreadPerTaskExecutor();
+
+        final InputMethodManager inputMethodManager = (InputMethodManager)
+                this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // Scoreboard elements, using the nav_header as container;
+        /*textViewScoreNumber =  root.findViewById(R.id.textViewScoreNumber);
+        textViewStreakNumber = root.findViewById(R.id.textViewStreakNumber);
+        textViewHighScoreNumber = root.findViewById(R.id.textViewHighScoreNumber);
+*/
+        importGameData();
+        //setScoreBoard();
+
+        executor.execute(() -> {
+            game.setDictionary(2, "2");
+
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            game.startNewGame();
+            secretWord.setText(game.getShownSecretWord());
+        });
+
+        executor.execute(() -> {
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.birds);
+            mediaPlayer.start();
+        });
+
+        // Enter as go-button, keep keyboard up
+        enterText.setOnEditorActionListener((v, actionId, event) -> {
+            enterLetter();
+            return true;
+        });
+
+        // Toggle-button for Scoreboard
+        toggleScoreBoard.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(scoreBoardDrawer.isDrawerOpen(GravityCompat.START)){
+                    scoreBoardDrawer.closeDrawer(GravityCompat.START, true);
+                } else {
+                    scoreBoardDrawer.openDrawer(GravityCompat.START, true);
+                }
+
+
+            }
+        });
+    }
+
+
+    private void enterLetter() {
+
+        String letter = enterText.getText().toString().toUpperCase();
+        enterText.setText(letter);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Clear enter text field
+                enterText.setText("");
+            }
+        }, 300);
+
+        if (!game.isALetter(letter)) {
+            Toast.makeText(this, "'" + letter + "' er ikke et bogstav!", Toast.LENGTH_SHORT).show();
+
+        } else if (game.isLetterAlreadyGuessed(letter)) {
+            Toast.makeText(this, "Prøv et andet bogstav!", Toast.LENGTH_SHORT).show();
+
+        } else if (game.validateLetter(letter)) {
+            secretWord.setText(game.getShownSecretWord());
+        } else {
+            int numberOfWrongGuesses = game.getNumberOfWrongGuesses();
+
+            if (numberOfWrongGuesses >= 6) {
+                MediaPlayer mediaPlayerCrack = MediaPlayer.create(this, R.raw.crack);
+                executor.execute(mediaPlayerCrack::start);
+
+            } else if (numberOfWrongGuesses == 5) {
+                MediaPlayer mediaPlayerRope = MediaPlayer.create(this, R.raw.rope);
+                executor.execute(mediaPlayerRope::start);
+
+            } else {
+                MediaPlayer mediaPlayerBirds = MediaPlayer.create(this, R.raw.birds);
+                executor.execute(mediaPlayerBirds::start);
+
+            }
+        }
+        new Handler().postDelayed(() -> {
+            updateImage(game.getNumberOfWrongGuesses());
+            wrongLetters.setText(game.getUsedWrongLetters());
+            if (game.isFinished()) {
+                checkWin();
+            }
+        }, 800);
+    }
+
+    private void checkWin() {
+        // TODO: Check if this can be refactored into game class
+        if (game.isWon()) {
+
+            // Update points and store data
+            int[] data = game.updateScoreOnWin();
+            storeGameData(data);
+            resetView();
+            Toast.makeText(this, "RIGTIG GÆT! \n" + game.getStreakCount() + " is your streak. Points:  " + game.getScore() + ". High score: " + game.getHighScore(), Toast.LENGTH_LONG).show();
+        } else {
+            game.setStreakCount(0);
+            game.setScore(0);
+            Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
+            new Handler().postDelayed(this::resetView, 2000);
+        }
+        importGameData();
+    }
+
+    private void resetView() {
+        game.startNewGame();
+        updateImage(game.getNumberOfWrongGuesses());
+        wrongLetters.setText(game.getUsedWrongLetters());
+        secretWord.setText(game.getShownSecretWord());
+    }
+
+    private void updateImage(int wrongGuesses) {
+        switch (wrongGuesses) {
+            case 0:
+                gameImage.setImageResource(R.drawable.hangman0);
+                break;
+            case 1:
+                gameImage.setImageResource(R.drawable.hangman1);
+                break;
+            case 2:
+                gameImage.setImageResource(R.drawable.hangman2);
+                break;
+            case 3:
+                gameImage.setImageResource(R.drawable.hangman3);
+                break;
+            case 4:
+                gameImage.setImageResource(R.drawable.hangman4);
+                break;
+            case 5:
+                gameImage.setImageResource(R.drawable.hangman5);
+                break;
+            case 6:
+                gameImage.setImageResource(R.drawable.hangman6);
+                break;
+        }
+    }
+
+    private void importGameData() {
+        int[] gameData = readGameData();
+        game.setStreakCount(gameData[0]);
+        game.setHighScore(gameData[1]);
+    }
+
+    private void storeGameData(int[] data) {
+
+        String input = Arrays
+                .stream(data)
+                .mapToObj(String::valueOf)
+                .reduce((a, b) -> a.concat(",").concat(b))
+                .get();
+
+        Log.d("Storing data", "Data from game, converted to string: " + input);
+
+        // New thread
+        executor.execute(() -> {
+            try (FileOutputStream outputStream = openFileOutput(
+                    dataFileName, MODE_PRIVATE)) {
+                outputStream.write(input.getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private int[] readGameData() {
+        int[] data = new int[2];
+        // New thread TODO: Maybe set variables from here? The array does not change.
+        executor.execute(() -> {
+            try (FileInputStream fileInputStream = openFileInput(dataFileName)) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+                String dataString = bufferedReader.readLine();
+                String[] dataStringArray = dataString.split(",");
+                data[0] = Integer.parseInt(dataStringArray[0]);
+                data[1] = Integer.parseInt(dataStringArray[1]);
+                Log.d("ReadGameData", "Imported data from file: " + data[0] + " and " + data[1]);
+            } catch (FileNotFoundException f) {
+                Log.e("readGameData", "Could not find a data file.");
+                f.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        try {
+            // Sleep to return updated data
+            Thread.sleep(1000);
+            Log.d("ReadGameData", "Returning data from file: " + data[0] + " and " + data[1]);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    private void setScoreBoard() {
+        textViewScoreNumber.setText(game.getScore());
+        textViewStreakNumber.setText(game.getStreakCount());
+        textViewHighScoreNumber.setText(game.getHighScore());
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+}
+
+

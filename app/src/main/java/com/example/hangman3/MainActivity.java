@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             int[] data = game.updateScoreOnWin();
             storeGameData(data);
             resetView();
-            Toast.makeText(this, "RIGTIG GÆT! \n" + game.getStreakCount() + " is your streak. Points:  " + game.getScore() + ". High score: " + game.getHighScore(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "RIGTIG GÆT!", Toast.LENGTH_LONG).show();
         } else {
             game.setStreakCount(0);
             game.setScore(0);

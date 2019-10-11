@@ -35,7 +35,6 @@ public class ScoreFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override

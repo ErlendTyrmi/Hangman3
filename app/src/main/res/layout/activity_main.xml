@@ -9,14 +9,14 @@
     tools:context=".MainActivity">
 
     <fragment
-        android:id="@+id/fragment"
+        android:id="@+id/fragmentL"
         android:name="com.example.hangman3.ScoreFragment"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_gravity="start" />
 
     <fragment
-        android:id="@+id/fragment2"
+        android:id="@+id/fragmentR"
         android:name="com.example.hangman3.SettingsFragment"
         android:layout_width="200dp"
         android:layout_height="match_parent"

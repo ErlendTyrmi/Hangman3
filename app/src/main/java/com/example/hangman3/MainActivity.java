@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
+import com.google.android.gms.common.api.Api;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         gameImage = this.findViewById(R.id.gameImage);
         enterText = this.findViewById(R.id.enterText);
         wrongLetters = this.findViewById(R.id.wrongLetters);
-        toggleScoreBoard = this.findViewById(R.id.scoreButton);
+        //toggleScoreBoard = this.findViewById(R.id.scoreButton);
         toggleSettings = this.findViewById(R.id.settingsButton);
         // Buttons from settings
 
@@ -79,13 +81,18 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         // Enter as go-button, keep keyboard up
         enterText.setOnEditorActionListener((v, actionId, event) -> {
             enterLetter();
+            if (drawerLayoutMain.isDrawerOpen(GravityCompat.START)){
+                drawerLayoutMain.closeDrawer(GravityCompat.START, true);
+            }
             return true;
         });
 
+        //enterText.onKeyUp();
+
         // Toggle-button for Scoreboard
-        toggleScoreBoard.setOnClickListener(v -> {
-            drawerLayoutMain.openDrawer(GravityCompat.START, true);
-        });
+        //toggleScoreBoard.setOnClickListener(v -> {
+        //    drawerLayoutMain.openDrawer(GravityCompat.START, true);
+        //});
 
         // Toggle-button for Scoreboard
         toggleSettings.setOnClickListener(v -> {
@@ -97,13 +104,6 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
 
         String letter = enterText.getText().toString().toUpperCase();
         enterText.setText(letter);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Clear enter text field
-                enterText.setText("");
-            }
-        }, 300);
 
         if (!game.isALetter(letter)) {
             Toast.makeText(this, "'" + letter + "' er ikke et bogstav!", Toast.LENGTH_SHORT).show();
@@ -113,17 +113,17 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
 
         } else if (game.validateLetter(letter)) {
             secretWord.setText(game.getShownSecretWord());
-        } else {
-            int numberOfWrongGuesses = game.getNumberOfWrongGuesses();
 
+        } else {
+
+            // Handle sounds
+            int numberOfWrongGuesses = game.getNumberOfWrongGuesses();
             if (numberOfWrongGuesses >= 6) {
                 MediaPlayer mediaPlayerCrack = MediaPlayer.create(this, R.raw.crack);
                 executor.execute(mediaPlayerCrack::start);
-
             } else if (numberOfWrongGuesses == 5) {
                 MediaPlayer mediaPlayerRope = MediaPlayer.create(this, R.raw.rope);
                 executor.execute(mediaPlayerRope::start);
-
             } else {
                 MediaPlayer mediaPlayerBirds = MediaPlayer.create(this, R.raw.birds);
                 executor.execute(mediaPlayerBirds::start);
@@ -136,40 +136,28 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             if (game.isFinished()) {
                 checkWin();
             }
-        }, 800);
+            enterText.setText("");
+        }, 500);
     }
 
     private void checkWin() {
         // TODO: Check if this can be refactored into game class
         if (game.isWon()) {
+            Toast.makeText(this, "RIGTIG GÆT!", Toast.LENGTH_LONG).show();
+            gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
-            showWinImage(game.getScore() > game.getHighScore());
             int[] data = game.updateScoreOnWin();
             storeGameData(data);
-            resetView();
-            Toast.makeText(this, "RIGTIG GÆT!", Toast.LENGTH_LONG).show();
         } else {
+            Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
             game.setStreakCount(0);
             game.setScore(0);
             storeGameData(new int[]{0, game.getHighScore()});
-            Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
-            new Handler().postDelayed(this::resetView, 2000);
+
         }
         importGameData();
         setScoreBoard();
-    }
-
-    private void showWinImage(boolean highScore){
-        if (highScore){
-            gameImage.setImageResource(R.drawable.hangmanhighscore);
-        } else {
-            gameImage.setImageResource(R.drawable.hangmanwin);
-        }
-        try {
-            Thread.sleep(2500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        new Handler().postDelayed(this::resetView, 3000);
     }
 
     private void resetView() {

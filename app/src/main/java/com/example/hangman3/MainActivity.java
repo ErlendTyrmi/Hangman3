@@ -3,15 +3,14 @@ package com.example.hangman3;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -29,12 +28,13 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements ScoreFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener {
     private GameInterface game = new Game();
-    private ImageButton toggleScoreBoard;
+    private ImageButton toggleScoreBoard, toggleSettings;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
-    private EditText enterText, textViewScoreNumber, textViewStreakNumber, textViewHighScoreNumber;
+    private EditText enterText;
+    private ScoreFragment scoreBoard;
     private DrawerLayout scoreBoardDrawer;
     private Executor executor;
     private final String dataFileName = "gameData.txt";
@@ -49,22 +49,21 @@ public class MainActivity extends AppCompatActivity implements ScoreFragment.OnF
         gameImage = this.findViewById(R.id.gameImage);
         enterText = this.findViewById(R.id.enterText);
         wrongLetters = this.findViewById(R.id.wrongLetters);
-        toggleScoreBoard = this.findViewById(R.id.toggleScoreBoard);
+        toggleScoreBoard = this.findViewById(R.id.scoreButton);
+        toggleSettings = this.findViewById(R.id.settingsButton);
         // Confusing: is not a drawer, but children can be drawers
         scoreBoardDrawer = this.findViewById(R.id.scoreBoardDrawerLayout);
-
         executor = new ThreadPerTaskExecutor();
+        // For manipulating views in fragments
+        FragmentManager fm = getSupportFragmentManager();
+        scoreBoard = (ScoreFragment)fm.findFragmentById(R.id.fragment);
 
         final InputMethodManager inputMethodManager = (InputMethodManager)
                 this.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        // Scoreboard elements, using the nav_header as container;
-        /*textViewScoreNumber =  root.findViewById(R.id.textViewScoreNumber);
-        textViewStreakNumber = root.findViewById(R.id.textViewStreakNumber);
-        textViewHighScoreNumber = root.findViewById(R.id.textViewHighScoreNumber);
-*/
+        // Get saved game data when starting up
         importGameData();
-        //setScoreBoard();
+        setScoreBoard();
 
         executor.execute(() -> {
             game.setDictionary(2, "2");
@@ -90,18 +89,23 @@ public class MainActivity extends AppCompatActivity implements ScoreFragment.OnF
         });
 
         // Toggle-button for Scoreboard
-        toggleScoreBoard.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if(scoreBoardDrawer.isDrawerOpen(GravityCompat.START)){
-                    scoreBoardDrawer.closeDrawer(GravityCompat.START, true);
-                } else {
-                    scoreBoardDrawer.openDrawer(GravityCompat.START, true);
-                }
-
-
+        toggleScoreBoard.setOnClickListener(v -> {
+            if(scoreBoardDrawer.isDrawerOpen(GravityCompat.START)){
+                scoreBoardDrawer.closeDrawer(GravityCompat.START, true);
+            } else {
+                scoreBoardDrawer.openDrawer(GravityCompat.START, true);
             }
+        });
+
+        // Toggle-button for Scoreboard
+        toggleSettings.setOnClickListener(v -> {
+            if(scoreBoardDrawer.isDrawerOpen(GravityCompat.END)){
+                scoreBoardDrawer.closeDrawer(GravityCompat.END, true);
+            } else {
+                scoreBoardDrawer.openDrawer(GravityCompat.END, true);
+            }
+
+
         });
     }
 
@@ -164,10 +168,12 @@ public class MainActivity extends AppCompatActivity implements ScoreFragment.OnF
         } else {
             game.setStreakCount(0);
             game.setScore(0);
+            storeGameData(new int[]{0, game.getHighScore()});
             Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
             new Handler().postDelayed(this::resetView, 2000);
         }
         importGameData();
+        setScoreBoard();
     }
 
     private void resetView() {
@@ -175,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements ScoreFragment.OnF
         updateImage(game.getNumberOfWrongGuesses());
         wrongLetters.setText(game.getUsedWrongLetters());
         secretWord.setText(game.getShownSecretWord());
+        scoreBoardDrawer.openDrawer(GravityCompat.START, true);
     }
 
     private void updateImage(int wrongGuesses) {
@@ -259,14 +266,14 @@ public class MainActivity extends AppCompatActivity implements ScoreFragment.OnF
     }
 
     private void setScoreBoard() {
-        textViewScoreNumber.setText(game.getScore());
-        textViewStreakNumber.setText(game.getStreakCount());
-        textViewHighScoreNumber.setText(game.getHighScore());
+        scoreBoard.setScore(game.getScore());
+        scoreBoard.setStreak(game.getStreakCount());
+        scoreBoard.setHighScore(game.getHighScore());
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
+        //
     }
 }
 

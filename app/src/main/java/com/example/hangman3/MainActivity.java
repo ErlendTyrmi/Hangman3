@@ -6,6 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
 import com.google.android.gms.common.api.Api;
@@ -80,8 +82,9 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
 
         // Enter as go-button, keep keyboard up
         enterText.setOnEditorActionListener((v, actionId, event) -> {
+            enterText.setHint("_");
             enterLetter();
-            if (drawerLayoutMain.isDrawerOpen(GravityCompat.START)){
+            if (drawerLayoutMain.isDrawerOpen(GravityCompat.START)) {
                 drawerLayoutMain.closeDrawer(GravityCompat.START, true);
             }
             return true;
@@ -258,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
     @Override
     public void onFragmentInteraction(int dictionary) {
 
-        switch(dictionary){
+        switch (dictionary) {
             case 0:
                 game.setDictionary(0, "");
                 break;

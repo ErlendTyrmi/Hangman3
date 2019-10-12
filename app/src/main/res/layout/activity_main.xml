@@ -38,7 +38,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/hangman0" />
+            app:srcCompat="@drawable/hangmanstart" />
 <!--
         <ImageButton
             android:id="@+id/scoreButton"
@@ -74,7 +74,7 @@
             android:textAllCaps="true"
             android:textColor="#ffffff"
             android:textColorHint="#FFFFFF"
-            android:textSize="30sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gameImage" />
@@ -87,7 +87,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="40dp"
             android:textAlignment="center"
-            android:textColor="#A39898"
+            android:textColor="#000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -98,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="_"
+            android:hint="Start spil"
             android:inputType="textCapWords"
             android:maxLength="1"
             android:textAlignment="center"

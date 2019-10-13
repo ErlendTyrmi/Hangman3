@@ -1,41 +1,35 @@
 package com.example.hangman3;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-
-import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
-import com.google.android.gms.common.api.Api;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.sql.SQLOutput;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements SettingsFragment.OnFragmentInteractionListener {
-    private GameInterface game = new Game();
-    private ImageButton toggleScoreBoard, toggleSettings, setDefaultDictionary, setDrDictionary, setDTU1Dictionary, setDTU2Doctionary;
+public class MainActivity extends AppCompatActivity {
+    private GameInterface game = Game.getGame();
+    private ImageButton toggleScoreBoard, toggleSettings;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
     private EditText enterText;
@@ -56,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         wrongLetters = this.findViewById(R.id.wrongLetters);
         //toggleScoreBoard = this.findViewById(R.id.scoreButton);
         toggleSettings = this.findViewById(R.id.settingsButton);
+
         // Buttons from settings
 
         // Confusing: is not a drawer, but children can be drawers
@@ -90,16 +85,16 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             return true;
         });
 
-        //enterText.onKeyUp();
-
         // Toggle-button for Scoreboard
         //toggleScoreBoard.setOnClickListener(v -> {
         //    drawerLayoutMain.openDrawer(GravityCompat.START, true);
         //});
 
-        // Toggle-button for Scoreboard
+        // Toggle-button for Settings
         toggleSettings.setOnClickListener(v -> {
-            drawerLayoutMain.openDrawer(GravityCompat.END, true);
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("currentDictionaryID", game.getCurrentDictionaryID());
+            startActivity(intent);
         });
     }
 
@@ -135,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         }
         new Handler().postDelayed(() -> {
             updateImage(game.getNumberOfWrongGuesses());
-            wrongLetters.setText(game.getUsedWrongLetters());
+            wrongLetters.setText(game.getUsedWrongLetters().toUpperCase());
             if (game.isFinished()) {
                 checkWin();
             }
@@ -256,25 +251,6 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         scoreBoardFragment.setScore(game.getScore());
         scoreBoardFragment.setStreak(game.getStreakCount());
         scoreBoardFragment.setHighScore(game.getHighScore());
-    }
-
-    @Override
-    public void onFragmentInteraction(int dictionary) {
-
-        switch (dictionary) {
-            case 0:
-                game.setDictionary(0, "");
-                break;
-            case 1:
-                game.setDictionary(1, "23");
-                break;
-            case 2:
-                game.setDictionary(2, "");
-                break;
-            default:
-        }
-
-        Toast.makeText(this, dictionary + " er valgt.", Toast.LENGTH_SHORT).show();
     }
 }
 

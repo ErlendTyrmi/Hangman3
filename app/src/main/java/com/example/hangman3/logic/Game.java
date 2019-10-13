@@ -1,17 +1,32 @@
 package com.example.hangman3.logic;
 
+import android.util.Log;
+
 import com.example.hangman3.logic.dtuLogic.Galgelogik;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class Game implements GameInterface {
+    private static Game game = null;
+    private int streakCount, highScore, score, currentDictionaryId;
 
     private Galgelogik galgelogik = new Galgelogik();
-    private int streakCount, highScore, score;
+
+    public static Game getGame() {
+        if (game == null) {
+            game = new Game();
+        } else {
+            //
+        }
+        return game;
+    }
 
     @Override
     public void setDictionary(int dictionaryId, String difficultyNumber) {
+        Log.d("Game", "Set dictionary alled with id " + dictionaryId);
+        this.currentDictionaryId = dictionaryId;
         try {
             switch (dictionaryId) {
                 case 1:
@@ -28,6 +43,10 @@ public class Game implements GameInterface {
             e.printStackTrace();
             System.out.println("Using the default dictionary.");
         }
+    }
+
+    public int getCurrentDictionaryID() {
+        return currentDictionaryId;
     }
 
     @Override

@@ -6,6 +6,8 @@ public interface GameInterface {
     // Setup list of words to choose from, and choose secret word
     void setDictionary(int dictionaryId, String difficulty);
 
+    int getCurrentDictionaryID();
+
     // Setup the word to guess
     void startNewGame();
 

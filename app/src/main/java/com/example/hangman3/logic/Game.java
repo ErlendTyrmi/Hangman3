@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Game implements GameInterface {
-    private static Game game = null;
+    private static GameInterface game = null;
     private int streakCount, highScore, score, currentDictionaryId;
     private boolean downloadingData;
 
     private Galgelogik galgelogik = new Galgelogik();
 
-    public static Game getGame() {
+    public static GameInterface getGame() {
         if (game == null) {
             game = new Game();
         } else {

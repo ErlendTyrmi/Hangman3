@@ -1,4 +1,4 @@
-package com.example.hangman3;
+package com.example.hangman3.logic;
 
 import java.util.concurrent.Executor;
 

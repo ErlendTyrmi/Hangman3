@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
+import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
 public class SettingsActivity extends AppCompatActivity {
     RadioGroup radioGroup;

@@ -1,6 +1,7 @@
 package com.example.hangman3;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +18,15 @@ import com.example.hangman3.logic.GameInterface;
 import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
 public class SettingsActivity extends AppCompatActivity {
-    RadioGroup radioGroup;
-    RadioButton defaultButton, dtuButton, drButton;
-    Switch switchToHardDTU;
-    TextView loading;
-    GameInterface game = Game.getGame();
-    ThreadPerTaskExecutor executor = new ThreadPerTaskExecutor();
+    private final String TAG = "SettingsActivity";
+    private RadioGroup radioGroup;
+    private RadioButton defaultButton, dtuButton, drButton;
+    private Switch switchToHardDTU;
+    private TextView loading;
+    private GameInterface game = Game.getGame();
+    private ThreadPerTaskExecutor executor = new ThreadPerTaskExecutor();
+    private int dictionaryId;
+    private boolean hardModeSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +42,13 @@ public class SettingsActivity extends AppCompatActivity {
         loading = findViewById(R.id.dictionaryLoadingTextView);
 
         int currentDictionaryID = intent.getIntExtra("currentDictionaryID", 0);
-        System.out.println(currentDictionaryID);
-        setDictionaryChecked(currentDictionaryID);
+        Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
+        setDictionaryCheckedOnCreate(currentDictionaryID);
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             // checkedId is the RadioButton selected
 
-            Toast.makeText(this, "Ja ja", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.dictionarychosen, Toast.LENGTH_SHORT).show();
             // Hide Difficulty option for all other dictionaries than DTU
             if (!dtuButton.isChecked()) {
                 switchToHardDTU.setVisibility(View.INVISIBLE);
@@ -55,14 +59,20 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         switchToHardDTU.setOnClickListener((View v) -> {
-            Log.d("Settings", "HARD mode set.");
-            // TODO: ERROR HANDLING
+            if (switchToHardDTU.isChecked()) {
+                hardModeSet = true;
+                Log.d(TAG, "HARD mode selected.");
+            } else {
+                hardModeSet = false;
+                Log.d(TAG, "HARD mode deselected.");
+            }
+
             setDictionary();
         });
     }
 
-    private void setDictionaryChecked(int id) {
-
+    private void setDictionaryCheckedOnCreate(int id) {
+        // Sets the right dictionary as checked on create.
         switch (id) {
             case 0:
                 defaultButton.setChecked(true);
@@ -77,31 +87,44 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setDictionary() {
-        loading.setVisibility(View.VISIBLE);
-        loading.setText(R.string.henter_ordliste);
 
-        executor.execute(() -> {
-            Log.d("Settings", "setDictionary called.");
-            if (defaultButton.isChecked()) {
+        if (defaultButton.isChecked()) {
+            dictionaryId = 0;
+        } else if (dtuButton.isChecked()) {
+            dictionaryId = 1;
+        } else if (drButton.isChecked()) {
+            dictionaryId = 2;
+        }
+
+        new DataDownloader().execute();
+    }
+
+    private class DataDownloader extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            loading.setVisibility(View.VISIBLE);
+            loading.setText(R.string.henter_ordliste);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d(TAG, "Setting dictionary: ");
+            if (dictionaryId == 0) {
                 game.setDictionary(0, "");
-            } else if (dtuButton.isChecked() && !switchToHardDTU.isActivated()) {
-                game.setDictionary(1, "1");
-            } else if (switchToHardDTU.isActivated()) {
-                game.setDictionary(1, "23");
-            } else if (drButton.isChecked()) {
+            } else if (hardModeSet) {
+                game.setDictionary(1, "3");
+            } else if (dictionaryId == 1) {
+                game.setDictionary(1, "12");
+            } else if (dictionaryId == 2) {
                 game.setDictionary(2, "");
             }
-
-        });
-        while (!game.isDataDownloaded()) {
-            System.out.println("Game downloading data...");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            return null;
         }
-        loading.setText("Færdig!");
-        game.setDataDownloadedFalse();
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            loading.setText("Færdig.");
+        }
     }
 }

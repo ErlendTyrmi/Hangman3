@@ -9,7 +9,7 @@ public interface GameInterface {
     int getCurrentDictionaryID();
 
     // Setup the word to guess
-    void startNewGame();
+    void startRound();
 
     int getScore();
 
@@ -48,9 +48,6 @@ public interface GameInterface {
     boolean isLetterAlreadyGuessed(String letter);
 
     // Update score and return streak count and highscore
-    int[] updateScoreOnWin();
+    int[] updateScore(boolean win);
 
-    boolean isDataDownloaded();
-
-    void setDataDownloadedFalse();
 }

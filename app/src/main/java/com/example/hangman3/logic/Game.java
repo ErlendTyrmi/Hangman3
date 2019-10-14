@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 public class Game implements GameInterface {
     private static GameInterface game = null;
     private int streakCount, highScore, score, currentDictionaryId;
-    private boolean downloadingData;
 
     private Galgelogik galgelogik = new Galgelogik();
 
@@ -44,7 +43,6 @@ public class Game implements GameInterface {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Using the default dictionary.");
-            galgelogik.setFalseIsDownloaded();
         }
     }
 
@@ -53,7 +51,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void startNewGame() {
+    public void startRound() {
         galgelogik.nulstil();
     }
 
@@ -145,23 +143,18 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int[] updateScoreOnWin() {
-        streakCount++;
-        score += galgelogik.getOrdet().length();
-
-        if (score > highScore) {
-            highScore = score;
+    public int[] updateScore(boolean win) {
+        if (win) {
+            streakCount++;
+            score += galgelogik.getOrdet().length();
+            if (score > highScore) {
+                highScore = score;
+            }
+        } else {
+            streakCount = 0;
+            score = 0;
         }
-        return new int[]{streakCount, highScore};
-    }
-
-    public boolean isDataDownloaded() {
-        return galgelogik.isDownloaded();
-    }
-
-    @Override
-    public void setDataDownloadedFalse() {
-        galgelogik.setFalseIsDownloaded();
+        return new int[]{score, streakCount, highScore};
     }
 }
 

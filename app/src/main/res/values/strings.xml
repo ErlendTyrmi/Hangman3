@@ -8,4 +8,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="v_lg_ordliste">Vælg ordliste</string>
     <string name="henter_ordliste">Henter ordliste...</string>
+    <string name="noletter">"' er ikke et bogstav!"</string>
+    <string name="tryotherletter">"Prøv et andet bogstav!"</string>
+    <string name="correctletter">RIGTIG GÆT!</string>
+    <string name="gameover">Spillet er slut. Prøv igen!</string>
+    <string name="dictionarychosen">Ordbog valgt</string>
 </resources>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -16,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.hangman3.logic.Game;
-import com.example.hangman3.logic.GameDataWriter;
+import com.example.hangman3.logic.GameData;
 import com.example.hangman3.logic.GameInterface;
 import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
@@ -24,27 +25,28 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private GameInterface game = Game.getGame();
-    private GameDataWriter gameDataWriter;
-    private ImageButton toggleSettings;
+    private GameData gameData;
+    private ImageButton settingsButton;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
-    private EditText enterText;
+    private EditText enterLetter;
     private ScoreFragment scoreBoardFragment;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
-    private final String dataFileName = "gameData.txt";
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        runGame();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        gameDataWriter = new GameDataWriter(game, this.getApplicationContext());
+        // Set default dictionary at boot.
+        game.setDictionary(0, "none");
+        gameData = new GameData(game, this.getApplicationContext());
+        runGame();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         runGame();
     }
 
@@ -53,16 +55,14 @@ public class MainActivity extends AppCompatActivity {
         // View elements
         secretWord = this.findViewById(R.id.secretWord);
         gameImage = this.findViewById(R.id.gameImage);
-        enterText = this.findViewById(R.id.enterText);
+        enterLetter = this.findViewById(R.id.enterLetter);
         wrongLetters = this.findViewById(R.id.wrongLetters);
-        toggleSettings = this.findViewById(R.id.settingsButton);
-
-        // Buttons from settings
-
+        settingsButton = this.findViewById(R.id.settingsButton);
         // Confusing: is not a drawer, but children can be drawers
         drawerLayoutMain = this.findViewById(R.id.scoreBoardDrawerLayout);
         executor = new ThreadPerTaskExecutor();
-        // For manipulating views in fragments
+
+        // For manipulating views in scoreboard
         FragmentManager fm = getSupportFragmentManager();
         scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
 
@@ -71,8 +71,7 @@ public class MainActivity extends AppCompatActivity {
         setScoreBoard();
 
         executor.execute(() -> {
-            game.setDictionary(0, "none");
-            game.startNewGame();
+            game.startRound(); // Round means guessing a single word
             secretWord.setText(game.getShownSecretWord());
         });
 
@@ -82,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Enter as go-button, keep keyboard up
-        enterText.setOnEditorActionListener((v, actionId, event) -> {
-            enterText.setHint("_");
-            enterLetter();
+        enterLetter.setOnEditorActionListener((v, actionId, event) -> {
+            enterLetter.setHint("_");
+            handleEnterLetter();
             if (drawerLayoutMain.isDrawerOpen(GravityCompat.START)) {
                 drawerLayoutMain.closeDrawer(GravityCompat.START, true);
             }
@@ -92,23 +91,24 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Toggle-button for Settings
-        toggleSettings.setOnClickListener(v -> {
+        settingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
             intent.putExtra("currentDictionaryID", game.getCurrentDictionaryID());
+            Log.d("MainActivity", "Called SettingsActivity. Dictionary set: " + game.getCurrentDictionaryID());
             startActivity(intent);
         });
     }
 
-    private void enterLetter() {
+    private void handleEnterLetter() {
 
-        String letter = enterText.getText().toString().toUpperCase();
-        enterText.setText(letter);
+        String letter = enterLetter.getText().toString().toUpperCase();
+        enterLetter.setText(letter);
 
         if (!game.isALetter(letter)) {
-            Toast.makeText(this, "'" + letter + "' er ikke et bogstav!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, letter + R.string.noletter, Toast.LENGTH_SHORT).show();
 
         } else if (game.isLetterAlreadyGuessed(letter)) {
-            Toast.makeText(this, "Prøv et andet bogstav!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.tryotherletter, Toast.LENGTH_SHORT).show();
 
         } else if (game.validateLetter(letter)) {
             secretWord.setText(game.getShownSecretWord());
@@ -133,34 +133,36 @@ public class MainActivity extends AppCompatActivity {
             updateImage(game.getNumberOfWrongGuesses());
             wrongLetters.setText(game.getUsedWrongLetters().toUpperCase());
             if (game.isFinished()) {
-                checkWin();
+                showResult();
             }
-            enterText.setText("");
+            enterLetter.setText("");
         }, 500);
     }
 
-    private void checkWin() {
+    private void showResult() {
         // TODO: Check if this can be refactored into game class
+        int[] data;
         if (game.isWon()) {
-            Toast.makeText(this, "RIGTIG GÆT!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.correctletter, Toast.LENGTH_LONG).show();
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
-            int[] data = game.updateScoreOnWin();
-            gameDataWriter.storeGameData(data);
+            data = game.updateScore(true);
         } else {
-            Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.gameover, Toast.LENGTH_LONG).show();
             game.setStreakCount(0);
             game.setScore(0);
-            gameDataWriter.storeGameData(new int[]{0, game.getHighScore()});
-
+            data = game.updateScore(false);
         }
-        importGameData();
-        setScoreBoard();
+        executor.execute(() -> {
+            gameData.storeGameData(data);
+            setScoreBoard();
+        });
+
         new Handler().postDelayed(this::resetView, 3000);
     }
 
     private void resetView() {
-        game.startNewGame();
+        game.startRound();
         updateImage(game.getNumberOfWrongGuesses());
         wrongLetters.setText(game.getUsedWrongLetters());
         secretWord.setText(game.getShownSecretWord());
@@ -194,9 +196,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importGameData() {
-        int[] gameData = gameDataWriter.readGameData();
-        game.setStreakCount(gameData[0]);
-        game.setHighScore(gameData[1]);
+        int[] gameData = this.gameData.readGameData();
+        game.setScore(gameData[0]);
+        game.setStreakCount(gameData[1]);
+        game.setHighScore(gameData[2]);
     }
 
     private void setScoreBoard() {

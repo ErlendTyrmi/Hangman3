@@ -21,13 +21,12 @@ public class Galgelogik {
     private boolean sidsteBogstavVarKorrekt;
     private boolean spilletErVundet;
     private boolean spilletErTabt;
-    private boolean downloaded = false;
 
     public Galgelogik() {
         muligeOrd.add("bil");
         // Kommenteret ud af hensyn til test af Erlend
-        //muligeOrd.add("computer");
-        /*
+         /*
+         muligeOrd.add("computer");
         muligeOrd.add("programmering");
         muligeOrd.add("motorvej");
         muligeOrd.add("busrute");
@@ -144,7 +143,6 @@ public class Galgelogik {
      * Hent ord fra DRs forside (https://dr.dk)
      */
     public void hentOrdFraDr() throws Exception {
-        downloaded = false; // Erlend
         String data = hentUrl("https://dr.dk");
         //System.out.println("data = " + data);
 
@@ -167,7 +165,6 @@ public class Galgelogik {
 
         System.out.println("muligeOrd = " + muligeOrd);
         nulstil();
-        downloaded = true; // Erlend
     }
 
 
@@ -180,7 +177,6 @@ public class Galgelogik {
      */
 
     public void hentOrdFraRegneark(String sværhedsgrader) throws Exception {
-        downloaded = false; // Erlend
         String id = "1RnwU9KATJB94Rhr7nurvjxfg09wAHMZPYB3uySBPO6M";
 
         System.out.println("Henter data som kommasepareret CSV fra regnearket https://docs.google.com/spreadsheets/d/" + id + "/edit?usp=sharing");
@@ -202,14 +198,5 @@ public class Galgelogik {
 
         System.out.println("muligeOrd = " + muligeOrd);
         nulstil();
-        downloaded = true; // Erlend
-    }
-
-    public boolean isDownloaded() {
-        return downloaded;
-    }
-
-    public void setFalseIsDownloaded() {
-        downloaded = false;
     }
 }

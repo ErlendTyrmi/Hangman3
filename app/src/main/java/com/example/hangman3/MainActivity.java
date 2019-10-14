@@ -69,11 +69,8 @@ public class MainActivity extends AppCompatActivity {
         // Get saved game data when starting up
         importGameData();
         setScoreBoard();
-
-        executor.execute(() -> {
-            game.startRound(); // Round means guessing a single word
-            secretWord.setText(game.getShownSecretWord());
-        });
+        game.startRound(); // Round means guessing a single word
+        secretWord.setText(game.getShownSecretWord());
 
         executor.execute(() -> {
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.birds);

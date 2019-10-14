@@ -5,17 +5,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
-import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
 public class SettingsActivity extends AppCompatActivity {
     private final String TAG = "SettingsActivity";
@@ -23,8 +22,8 @@ public class SettingsActivity extends AppCompatActivity {
     private RadioButton defaultButton, dtuButton, drButton;
     private Switch switchToHardDTU;
     private TextView loading;
+    private ImageButton backbutton;
     private GameInterface game = Game.getGame();
-    private ThreadPerTaskExecutor executor = new ThreadPerTaskExecutor();
     private int dictionaryId;
     private boolean hardModeSet = false;
 
@@ -40,21 +39,15 @@ public class SettingsActivity extends AppCompatActivity {
         drButton = findViewById(R.id.radioButtonDR);
         switchToHardDTU = findViewById(R.id.switchToHardDTU);
         loading = findViewById(R.id.dictionaryLoadingTextView);
+        backbutton = findViewById(R.id.backButton);
 
         int currentDictionaryID = intent.getIntExtra("currentDictionaryID", 0);
         Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
         setDictionaryCheckedOnCreate(currentDictionaryID);
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            // checkedId is the RadioButton selected
-
-            Toast.makeText(this, R.string.dictionarychosen, Toast.LENGTH_SHORT).show();
             // Hide Difficulty option for all other dictionaries than DTU
-            if (!dtuButton.isChecked()) {
-                switchToHardDTU.setVisibility(View.INVISIBLE);
-            } else {
-                switchToHardDTU.setVisibility(View.VISIBLE);
-            }
+            setModeButtonVisibility();
             setDictionary();
         });
 
@@ -68,6 +61,10 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             setDictionary();
+        });
+
+        backbutton.setOnClickListener(v -> {
+            onBackPressed();
         });
     }
 
@@ -83,6 +80,15 @@ public class SettingsActivity extends AppCompatActivity {
             case 2:
                 drButton.setChecked(true);
                 break;
+        }
+        setModeButtonVisibility();
+    }
+
+    private void setModeButtonVisibility() {
+        if (!dtuButton.isChecked()) {
+            switchToHardDTU.setVisibility(View.INVISIBLE);
+        } else {
+            switchToHardDTU.setVisibility(View.VISIBLE);
         }
     }
 
@@ -105,6 +111,7 @@ public class SettingsActivity extends AppCompatActivity {
         protected void onPreExecute() {
             loading.setVisibility(View.VISIBLE);
             loading.setText(R.string.henter_ordliste);
+            backbutton.setEnabled(false);
         }
 
         @Override
@@ -124,7 +131,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            loading.setText("Færdig.");
+            loading.setText(R.string.donedownloading);
+            backbutton.setEnabled(true);
         }
     }
 }

@@ -13,4 +13,5 @@
     <string name="correctletter">RIGTIG GÆT!</string>
     <string name="gameover">Spillet er slut. Prøv igen!</string>
     <string name="dictionarychosen">Ordbog valgt</string>
+    <string name="donedownloading">Færdig.</string>
 </resources>

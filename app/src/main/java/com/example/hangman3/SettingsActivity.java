@@ -122,7 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
             } else if (hardModeSet) {
                 game.setDictionary(1, "3");
             } else if (dictionaryId == 1) {
-                game.setDictionary(1, "12");
+                game.setDictionary(1, "1");
             } else if (dictionaryId == 2) {
                 game.setDictionary(2, "");
             }

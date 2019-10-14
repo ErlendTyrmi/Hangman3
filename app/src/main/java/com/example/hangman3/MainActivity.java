@@ -102,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
         enterLetter.setText(letter);
 
         if (!game.isALetter(letter)) {
-            Toast.makeText(this, letter + R.string.noletter, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.noletter), Toast.LENGTH_SHORT).show();
 
         } else if (game.isLetterAlreadyGuessed(letter)) {
-            Toast.makeText(this, R.string.tryotherletter, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.tryotherletter), Toast.LENGTH_SHORT).show();
 
         } else if (game.validateLetter(letter)) {
             secretWord.setText(game.getShownSecretWord());
@@ -140,12 +140,12 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Check if this can be refactored into game class
         int[] data;
         if (game.isWon()) {
-            Toast.makeText(this, R.string.correctletter, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.correctletter), Toast.LENGTH_LONG).show();
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
             data = game.updateScore(true);
         } else {
-            Toast.makeText(this, R.string.gameover, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.gameover), Toast.LENGTH_LONG).show();
             game.setStreakCount(0);
             game.setScore(0);
             data = game.updateScore(false);

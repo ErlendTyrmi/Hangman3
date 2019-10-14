@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ public class SettingsActivity extends AppCompatActivity {
     RadioGroup radioGroup;
     RadioButton defaultButton, dtuButton, drButton;
     Switch switchToHardDTU;
+    TextView loading;
     GameInterface game = Game.getGame();
     ThreadPerTaskExecutor executor = new ThreadPerTaskExecutor();
 
@@ -32,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
         dtuButton = findViewById(R.id.radioButtonDTU);
         drButton = findViewById(R.id.radioButtonDR);
         switchToHardDTU = findViewById(R.id.switchToHardDTU);
+        loading = findViewById(R.id.dictionaryLoadingTextView);
 
         int currentDictionaryID = intent.getIntExtra("currentDictionaryID", 0);
         System.out.println(currentDictionaryID);
@@ -73,9 +76,11 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setDictionary() {
-        executor.execute(() -> {
+        loading.setVisibility(View.VISIBLE);
+        loading.setText(R.string.henter_ordliste);
 
-            Log.d("Settings", "setDictionary alled.");
+        executor.execute(() -> {
+            Log.d("Settings", "setDictionary called.");
             if (defaultButton.isChecked()) {
                 game.setDictionary(0, "");
             } else if (dtuButton.isChecked() && !switchToHardDTU.isActivated()) {
@@ -87,6 +92,15 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
         });
-
+        while (!game.isDataDownloaded()) {
+            System.out.println("Game downloading data...");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        loading.setText("Færdig!");
+        game.setDataDownloadedFalse();
     }
 }

@@ -49,4 +49,8 @@ public interface GameInterface {
 
     // Update score and return streak count and highscore
     int[] updateScoreOnWin();
+
+    boolean isDataDownloaded();
+
+    void setDataDownloadedFalse();
 }

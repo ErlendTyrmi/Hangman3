@@ -39,9 +39,19 @@ public class MainActivity extends AppCompatActivity {
     private final String dataFileName = "gameData.txt";
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        runGame();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        runGame();
+    }
+
+    protected void runGame() {
 
         // View elements
         secretWord = this.findViewById(R.id.secretWord);

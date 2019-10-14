@@ -37,11 +37,13 @@ public class Game implements GameInterface {
                     galgelogik.hentOrdFraDr();
                     break;
                 default:
+                    galgelogik = new Galgelogik();
                     System.out.println("Using the default dictionary.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            galgelogik = new Galgelogik();
             System.out.println("Using the default dictionary.");
         }
     }
@@ -52,7 +54,10 @@ public class Game implements GameInterface {
 
     @Override
     public void startRound() {
-        galgelogik.nulstil();
+        // Protection against too long words
+        do {
+            galgelogik.nulstil();
+        } while (galgelogik.getOrdet().length() > 16);
     }
 
     @Override

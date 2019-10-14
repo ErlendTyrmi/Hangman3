@@ -65,6 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         backbutton.setOnClickListener(v -> {
             onBackPressed();
+            finish();
         });
     }
 

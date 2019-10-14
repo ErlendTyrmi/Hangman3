@@ -88,7 +88,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/enterText"
+            android:id="@+id/enterLetter"
             style="@style/Widget.AppCompat.AutoCompleteTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

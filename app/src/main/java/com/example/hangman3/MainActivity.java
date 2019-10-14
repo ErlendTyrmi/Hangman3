@@ -17,58 +17,60 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.hangman3.logic.Game;
+import com.example.hangman3.logic.GameData;
 import com.example.hangman3.logic.GameInterface;
+import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private GameInterface game = Game.getGame();
-    private ImageButton toggleScoreBoard, toggleSettings;
+    private GameData gameData;
+    private ImageButton settingsButton;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
-    private EditText enterText;
+    private EditText enterLetter;
     private ScoreFragment scoreBoardFragment;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
-    private final String dataFileName = "gameData.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Set default dictionary at boot.
+        game.setDictionary(0, "none");
+        gameData = new GameData(game, this.getApplicationContext());
+        runGame();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        runGame();
+    }
+
+    protected void runGame() {
 
         // View elements
         secretWord = this.findViewById(R.id.secretWord);
         gameImage = this.findViewById(R.id.gameImage);
-        enterText = this.findViewById(R.id.enterText);
+        enterLetter = this.findViewById(R.id.enterLetter);
         wrongLetters = this.findViewById(R.id.wrongLetters);
-        //toggleScoreBoard = this.findViewById(R.id.scoreButton);
-        toggleSettings = this.findViewById(R.id.settingsButton);
-
-        // Buttons from settings
-
+        settingsButton = this.findViewById(R.id.settingsButton);
         // Confusing: is not a drawer, but children can be drawers
         drawerLayoutMain = this.findViewById(R.id.scoreBoardDrawerLayout);
         executor = new ThreadPerTaskExecutor();
-        // For manipulating views in fragments
+
+        // For manipulating views in scoreboard
         FragmentManager fm = getSupportFragmentManager();
         scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
 
         // Get saved game data when starting up
         importGameData();
         setScoreBoard();
-
-        executor.execute(() -> {
-            game.setDictionary(0, "none");
-            game.startNewGame();
-            secretWord.setText(game.getShownSecretWord());
-        });
+        game.startRound(); // Round means guessing a single word
+        secretWord.setText(game.getShownSecretWord());
 
         executor.execute(() -> {
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.birds);
@@ -76,38 +78,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Enter as go-button, keep keyboard up
-        enterText.setOnEditorActionListener((v, actionId, event) -> {
-            enterText.setHint("_");
-            enterLetter();
+        enterLetter.setOnEditorActionListener((v, actionId, event) -> {
+            enterLetter.setHint("_");
+            handleEnterLetter();
             if (drawerLayoutMain.isDrawerOpen(GravityCompat.START)) {
                 drawerLayoutMain.closeDrawer(GravityCompat.START, true);
             }
             return true;
         });
 
-        // Toggle-button for Scoreboard
-        //toggleScoreBoard.setOnClickListener(v -> {
-        //    drawerLayoutMain.openDrawer(GravityCompat.START, true);
-        //});
-
         // Toggle-button for Settings
-        toggleSettings.setOnClickListener(v -> {
+        settingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
             intent.putExtra("currentDictionaryID", game.getCurrentDictionaryID());
+            Log.d("MainActivity", "Called SettingsActivity. Dictionary set: " + game.getCurrentDictionaryID());
             startActivity(intent);
         });
     }
 
-    private void enterLetter() {
+    private void handleEnterLetter() {
 
-        String letter = enterText.getText().toString().toUpperCase();
-        enterText.setText(letter);
+        String letter = enterLetter.getText().toString().toUpperCase();
+        enterLetter.setText(letter);
 
         if (!game.isALetter(letter)) {
-            Toast.makeText(this, "'" + letter + "' er ikke et bogstav!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, letter + R.string.noletter, Toast.LENGTH_SHORT).show();
 
         } else if (game.isLetterAlreadyGuessed(letter)) {
-            Toast.makeText(this, "Prøv et andet bogstav!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.tryotherletter, Toast.LENGTH_SHORT).show();
 
         } else if (game.validateLetter(letter)) {
             secretWord.setText(game.getShownSecretWord());
@@ -132,34 +130,36 @@ public class MainActivity extends AppCompatActivity {
             updateImage(game.getNumberOfWrongGuesses());
             wrongLetters.setText(game.getUsedWrongLetters().toUpperCase());
             if (game.isFinished()) {
-                checkWin();
+                showResult();
             }
-            enterText.setText("");
+            enterLetter.setText("");
         }, 500);
     }
 
-    private void checkWin() {
+    private void showResult() {
         // TODO: Check if this can be refactored into game class
+        int[] data;
         if (game.isWon()) {
-            Toast.makeText(this, "RIGTIG GÆT!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.correctletter, Toast.LENGTH_LONG).show();
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
-            int[] data = game.updateScoreOnWin();
-            storeGameData(data);
+            data = game.updateScore(true);
         } else {
-            Toast.makeText(this, "Spillet er slut. Prøv igen!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.gameover, Toast.LENGTH_LONG).show();
             game.setStreakCount(0);
             game.setScore(0);
-            storeGameData(new int[]{0, game.getHighScore()});
-
+            data = game.updateScore(false);
         }
-        importGameData();
-        setScoreBoard();
+        executor.execute(() -> {
+            gameData.storeGameData(data);
+            setScoreBoard();
+        });
+
         new Handler().postDelayed(this::resetView, 3000);
     }
 
     private void resetView() {
-        game.startNewGame();
+        game.startRound();
         updateImage(game.getNumberOfWrongGuesses());
         wrongLetters.setText(game.getUsedWrongLetters());
         secretWord.setText(game.getShownSecretWord());
@@ -193,58 +193,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void importGameData() {
-        int[] gameData = readGameData();
-        game.setStreakCount(gameData[0]);
-        game.setHighScore(gameData[1]);
-    }
-
-    private void storeGameData(int[] data) {
-
-        String input = Arrays
-                .stream(data)
-                .mapToObj(String::valueOf)
-                .reduce((a, b) -> a.concat(",").concat(b))
-                .get();
-
-        Log.d("Storing data", "Data from game, converted to string: " + input);
-
-        // New thread
-        executor.execute(() -> {
-            try (FileOutputStream outputStream = openFileOutput(
-                    dataFileName, MODE_PRIVATE)) {
-                outputStream.write(input.getBytes());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    private int[] readGameData() {
-        int[] data = new int[2];
-        // New thread TODO: Maybe set variables from here? The array does not change.
-        executor.execute(() -> {
-            try (FileInputStream fileInputStream = openFileInput(dataFileName)) {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-                String dataString = bufferedReader.readLine();
-                String[] dataStringArray = dataString.split(",");
-                data[0] = Integer.parseInt(dataStringArray[0]);
-                data[1] = Integer.parseInt(dataStringArray[1]);
-                Log.d("ReadGameData", "Imported data from file: " + data[0] + " and " + data[1]);
-            } catch (FileNotFoundException f) {
-                Log.e("readGameData", "Could not find a data file.");
-                f.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        try {
-            // Sleep to return updated data
-            Thread.sleep(1000);
-            Log.d("ReadGameData", "Returning data from file: " + data[0] + " and " + data[1]);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return data;
+        int[] gameData = this.gameData.readGameData();
+        game.setScore(gameData[0]);
+        game.setStreakCount(gameData[1]);
+        game.setHighScore(gameData[2]);
     }
 
     private void setScoreBoard() {

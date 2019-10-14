@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Game implements GameInterface {
-    private static Game game = null;
+    private static GameInterface game = null;
     private int streakCount, highScore, score, currentDictionaryId;
 
     private Galgelogik galgelogik = new Galgelogik();
 
-    public static Game getGame() {
+    public static GameInterface getGame() {
         if (game == null) {
             game = new Game();
         } else {
@@ -25,7 +25,7 @@ public class Game implements GameInterface {
 
     @Override
     public void setDictionary(int dictionaryId, String difficultyNumber) {
-        Log.d("Game", "Set dictionary alled with id " + dictionaryId);
+        Log.d("Game", "Set dictionary called with id " + dictionaryId);
         this.currentDictionaryId = dictionaryId;
         try {
             switch (dictionaryId) {
@@ -39,6 +39,7 @@ public class Game implements GameInterface {
                 default:
                     System.out.println("Using the default dictionary.");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Using the default dictionary.");
@@ -50,7 +51,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void startNewGame() {
+    public void startRound() {
         galgelogik.nulstil();
     }
 
@@ -142,14 +143,18 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int[] updateScoreOnWin() {
-        streakCount++;
-        score += galgelogik.getOrdet().length();
-
-        if (score > highScore) {
-            highScore = score;
+    public int[] updateScore(boolean win) {
+        if (win) {
+            streakCount++;
+            score += galgelogik.getOrdet().length();
+            if (score > highScore) {
+                highScore = score;
+            }
+        } else {
+            streakCount = 0;
+            score = 0;
         }
-        return new int[]{streakCount, highScore};
+        return new int[]{score, streakCount, highScore};
     }
 }
 

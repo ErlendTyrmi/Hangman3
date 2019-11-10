@@ -1,10 +1,18 @@
 package com.example.hangman3.logic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public interface GameInterface {
     // Interface for the apps game com.example.hangman3.logic
 
+    // Get dictionaries from the world wide web
+    void importDictionaries() throws Exception;
+
     // Setup list of words to choose from, and choose secret word
-    void setDictionary(int dictionaryId);
+    void setDictionary(int dictionaryId) throws Exception;
+
+    HashMap<Integer, ArrayList<String>> getDictionaries();
 
     int getCurrentDictionaryID();
 

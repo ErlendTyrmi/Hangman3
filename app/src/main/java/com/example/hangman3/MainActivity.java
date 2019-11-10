@@ -1,11 +1,10 @@
 package com.example.hangman3;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -37,29 +36,13 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
     private ProgressBar progressBar;
+    private SoundPlayer soundPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Set default dictionary at boot.
-        //progressBar = this.findViewById(R.id.progressBar);
-        new GameSetup().execute();
-        game = Game.getGame();
-        game.setDictionary(0);
-        gameData = new GameData(game, this.getApplicationContext());
-        runGame();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        //runGame();
-        resetView();
-    }
-
-    protected void runGame() {
 
         // View elements
         secretWord = this.findViewById(R.id.secretWord);
@@ -73,17 +56,30 @@ public class MainActivity extends AppCompatActivity {
         // For manipulating views in scoreboard
         FragmentManager fm = getSupportFragmentManager();
         scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
+        soundPlayer = new SoundPlayer(this.getApplicationContext());
+        game = Game.getGame();
+        progressBar = this.findViewById(R.id.progressBar);
+        // Import dictionaries. Game is started from end of this.
+        new DictionaryImporter().execute();
+        gameData = new GameData(game, this.getApplicationContext());
+    }
 
-        // Get saved game data when starting up
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        //runGame();
+        resetView();
+    }
+
+    protected void runGame() {
+
+        // Get saved game data from disk when starting up
         importGameData();
         setScoreBoard();
         game.startRound(); // Round means guessing a single word
         secretWord.setText(game.getShownSecretWord());
 
-        executor.execute(() -> {
-            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.birds);
-            mediaPlayer.start();
-        });
+        soundPlayer.play("birds");
 
         // Enter as go-button, keep keyboard up
         enterLetter.setOnEditorActionListener((v, actionId, event) -> {
@@ -98,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         // Toggle-button for Settings
         settingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
-            intent.putExtra("currentDictionaryID", game.getCurrentDictionaryID());
-            Log.d("MainActivity", "Called SettingsActivity. Dictionary set: " + game.getCurrentDictionaryID());
             startActivity(intent);
         });
     }
@@ -122,16 +116,15 @@ public class MainActivity extends AppCompatActivity {
 
             // Handle sounds
             int numberOfWrongGuesses = game.getNumberOfWrongGuesses();
-            if (numberOfWrongGuesses >= 6) {
-                MediaPlayer mediaPlayerCrack = MediaPlayer.create(this, R.raw.crack);
-                executor.execute(mediaPlayerCrack::start);
-            } else if (numberOfWrongGuesses == 5) {
-                MediaPlayer mediaPlayerRope = MediaPlayer.create(this, R.raw.rope);
-                executor.execute(mediaPlayerRope::start);
-            } else {
-                MediaPlayer mediaPlayerBirds = MediaPlayer.create(this, R.raw.birds);
-                executor.execute(mediaPlayerBirds::start);
 
+            if (numberOfWrongGuesses >= 6) {
+                soundPlayer.play("crack");
+
+            } else if (numberOfWrongGuesses == 5) {
+                soundPlayer.play("rope");
+
+            } else {
+                soundPlayer.play("birds");
             }
         }
         new Handler().postDelayed(() -> {
@@ -145,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showResult() {
-        // TODO: Check if this can be refactored into game class
         int[] data;
         if (game.isWon()) {
             Toast.makeText(this, getResources().getString(R.string.correctletter), Toast.LENGTH_LONG).show();
@@ -201,22 +193,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class GameSetup extends AsyncTask<Void, Void, Void> {
+    private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {
 
         @Override
         protected void onPreExecute() {
-            //progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            game = Game.getGame();
-            return null;
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                game.importDictionaries();
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            //progressBar.setVisibility(View.INVISIBLE);
+        protected void onPostExecute(Boolean works) {
+            if (!works) {
+                Toast.makeText(getApplicationContext(), "Ingen netforbindelse", Toast.LENGTH_LONG).show();
+            }
+            progressBar.setVisibility(View.INVISIBLE);
+            runGame();
+            // Import should happen in background on startup, so default dictionary is enforced.
         }
     }
 

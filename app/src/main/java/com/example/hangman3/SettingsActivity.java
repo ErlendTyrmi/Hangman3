@@ -1,6 +1,5 @@
 package com.example.hangman3;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +9,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameInterface;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SettingsActivity extends AppCompatActivity {
     private final String TAG = "SettingsActivity";
@@ -25,12 +28,12 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageButton backbutton;
     private GameInterface game = Game.getGame();
     private int dictionaryId;
+    HashMap<Integer, ArrayList<String>> dictionaries;
     private boolean hardModeSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
         setContentView(R.layout.activity_settings);
 
         radioGroup = findViewById(R.id.radioGroup);
@@ -41,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         loading = findViewById(R.id.dictionaryLoadingTextView);
         backbutton = findViewById(R.id.backButton);
 
-        int currentDictionaryID = intent.getIntExtra("currentDictionaryID", 0);
+        int currentDictionaryID = game.getCurrentDictionaryID();
         Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
         setDictionaryCheckedOnCreate(currentDictionaryID);
 
@@ -79,6 +82,9 @@ public class SettingsActivity extends AppCompatActivity {
                 dtuButton.setChecked(true);
                 break;
             case 2:
+                dtuButton.setChecked(true); // Two DTU lists
+                break;
+            case 3:
                 drButton.setChecked(true);
                 break;
         }
@@ -106,7 +112,7 @@ public class SettingsActivity extends AppCompatActivity {
         new DataDownloader().execute();
     }
 
-    private class DataDownloader extends AsyncTask<Void, Void, Void> {
+    private class DataDownloader extends AsyncTask<Void, Boolean, Boolean> {
 
         @Override
         protected void onPreExecute() {
@@ -116,24 +122,50 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            Log.d(TAG, "Setting dictionary: ");
-            if (dictionaryId == 0) {
-                game.setDictionary(0);
-            } else if (hardModeSet) {
-                game.setDictionary(2);
-            } else if (dictionaryId == 1) {
-                game.setDictionary(1);
-            } else if (dictionaryId == 2) {
-                // 2 -> 3 because 1 has two difficulty settings
-                game.setDictionary(3);
+        protected Boolean doInBackground(Void... voids) {
+            // Retry download if dictionary missing.
+            dictionaries = game.getDictionaries();
+            boolean allImported = true;
+            for (int i = 0; i < 4; i++) {
+                if (dictionaries.get(i) != null && dictionaries.get(i).size() < 1) {
+                    allImported = false;
+
+                }
             }
-            return null;
+            if (!allImported) {
+                try {
+                    game.importDictionaries();
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            Log.d(TAG, "Setting dictionary: ");
+            try {
+                if (dictionaryId == 0) {
+                    game.setDictionary(0);
+                } else if (hardModeSet) {
+                    game.setDictionary(2);
+                } else if (dictionaryId == 1) {
+                    game.setDictionary(1);
+                } else if (dictionaryId == 2) {
+                    // 2 -> 3 because 1 has two difficulty settings
+                    game.setDictionary(3);
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            loading.setText(R.string.donedownloading);
+        protected void onPostExecute(Boolean works) {
+            if (!works) {
+                Toast.makeText(SettingsActivity.this, "Ingen netforbindelse.", Toast.LENGTH_SHORT).show();
+                loading.setText("Download fejlede.");
+            } else {
+                loading.setText(R.string.donedownloading);
+            }
             backbutton.setEnabled(true);
         }
     }

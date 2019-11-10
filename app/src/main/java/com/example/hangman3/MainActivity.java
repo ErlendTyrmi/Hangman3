@@ -2,6 +2,7 @@ package com.example.hangman3;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +27,7 @@ import com.example.hangman3.logic.ThreadPerTaskExecutor;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
-    private GameInterface game = Game.getGame();
+    private GameInterface game;
     private GameData gameData;
     private ImageButton settingsButton;
     private ImageView gameImage;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ScoreFragment scoreBoardFragment;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Set default dictionary at boot.
-        game.setDictionary(0, "none");
+        //progressBar = this.findViewById(R.id.progressBar);
+        new GameSetup().execute();
+        game = Game.getGame();
+        game.setDictionary(0);
         gameData = new GameData(game, this.getApplicationContext());
         runGame();
     }
@@ -49,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        runGame();
+        //runGame();
+        resetView();
     }
 
     protected void runGame() {
@@ -63,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         // Confusing: is not a drawer, but children can be drawers
         drawerLayoutMain = this.findViewById(R.id.scoreBoardDrawerLayout);
         executor = new ThreadPerTaskExecutor();
-
         // For manipulating views in scoreboard
         FragmentManager fm = getSupportFragmentManager();
         scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
@@ -148,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             data = game.updateScore(true);
         } else {
             Toast.makeText(this, getResources().getString(R.string.gameover), Toast.LENGTH_LONG).show();
+            secretWord.setText(game.getSecretWord());
             game.setStreakCount(0);
             game.setScore(0);
             data = game.updateScore(false);
@@ -191,6 +198,25 @@ public class MainActivity extends AppCompatActivity {
             case 6:
                 gameImage.setImageResource(R.drawable.hangman6);
                 break;
+        }
+    }
+
+    private class GameSetup extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            //progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            game = Game.getGame();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //progressBar.setVisibility(View.INVISIBLE);
         }
     }
 

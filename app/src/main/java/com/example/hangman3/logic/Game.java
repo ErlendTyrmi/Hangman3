@@ -2,8 +2,6 @@ package com.example.hangman3.logic;
 
 import android.util.Log;
 
-import com.example.hangman3.logic.dtuLogic.Galgelogik;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -13,39 +11,74 @@ public class Game implements GameInterface {
     private int streakCount, highScore, score, currentDictionaryId;
 
     private Galgelogik galgelogik = new Galgelogik();
+    private ArrayList<String>[] dictionaries;
+    private ArrayList<String> dictionary;
 
     public static GameInterface getGame() {
         if (game == null) {
             game = new Game();
-        } else {
-            //
         }
         return game;
     }
 
+    public Game() {
+        // Import online dictionaries at startup
+        importDictionaries();
+    }
+
+    private void importDictionaries() {
+        dictionaries = new ArrayList[4];
+        try {
+            // Reset muligeord.
+            galgelogik = new Galgelogik();
+            dictionaries[0] = galgelogik.muligeOrd;
+
+            galgelogik.hentOrdFraRegneark("1");
+            dictionaries[1] = galgelogik.muligeOrd;
+
+            galgelogik.hentOrdFraRegneark("3");
+            dictionaries[2] = galgelogik.muligeOrd;
+
+            galgelogik.hentOrdFraDr();
+            dictionaries[3] = galgelogik.muligeOrd;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
-    public void setDictionary(int dictionaryId, String difficultyNumber) {
+    public void setDictionary(int dictionaryId) {
         Log.d("Game", "Set dictionary called with id " + dictionaryId);
         this.currentDictionaryId = dictionaryId;
         try {
             switch (dictionaryId) {
                 case 1:
-                    galgelogik.hentOrdFraRegneark(difficultyNumber);
-                    // "1" er nem "3" er svær. Kan kombineres som "12"
+                    // DTU easy
+                    dictionary = dictionaries[1];
                     break;
                 case 2:
-                    galgelogik.hentOrdFraDr();
+                    // DTU hard
+                    dictionary = dictionaries[2];
+                    break;
+                case 3:
+                    // DR
+                    dictionary = dictionaries[3];
                     break;
                 default:
-                    galgelogik = new Galgelogik();
+                    // Default dictionary
+                    dictionary = dictionaries[0];
                     System.out.println("Using the default dictionary.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            galgelogik = new Galgelogik();
+            // Try importing dictionaries again.
+            importDictionaries();
             System.out.println("Using the default dictionary.");
         }
+        // Set dictionary in underlying logic "galgelogik"
+        galgelogik.muligeOrd = dictionary;
     }
 
     public int getCurrentDictionaryID() {
@@ -115,6 +148,11 @@ public class Game implements GameInterface {
             word += backendWord.substring(i, i + 1) + ' ';
         }
         return word.substring(0, word.length() - 1);
+    }
+
+    @Override
+    public String getSecretWord() {
+        return galgelogik.getOrdet();
     }
 
     @Override

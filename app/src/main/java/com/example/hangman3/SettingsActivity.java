@@ -119,13 +119,14 @@ public class SettingsActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Log.d(TAG, "Setting dictionary: ");
             if (dictionaryId == 0) {
-                game.setDictionary(0, "");
+                game.setDictionary(0);
             } else if (hardModeSet) {
-                game.setDictionary(1, "3");
+                game.setDictionary(2);
             } else if (dictionaryId == 1) {
-                game.setDictionary(1, "1");
+                game.setDictionary(1);
             } else if (dictionaryId == 2) {
-                game.setDictionary(2, "");
+                // 2 -> 3 because 1 has two difficulty settings
+                game.setDictionary(3);
             }
             return null;
         }

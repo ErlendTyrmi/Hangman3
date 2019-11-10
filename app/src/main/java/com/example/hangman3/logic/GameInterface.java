@@ -4,7 +4,7 @@ public interface GameInterface {
     // Interface for the apps game com.example.hangman3.logic
 
     // Setup list of words to choose from, and choose secret word
-    void setDictionary(int dictionaryId, String difficulty);
+    void setDictionary(int dictionaryId);
 
     int getCurrentDictionaryID();
 
@@ -37,6 +37,9 @@ public interface GameInterface {
 
     // Get the secret word formatted to hide letters
     String getShownSecretWord();
+
+    // Get the whole word to display to loser
+    String getSecretWord();
 
     // Get a string with all wrong letters guessed
     String getUsedWrongLetters();

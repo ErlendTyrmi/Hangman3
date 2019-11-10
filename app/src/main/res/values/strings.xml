@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Hangman3</string>
+    <string name="app_name">s132962 Hangman 3</string>
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -14,4 +14,5 @@
     <string name="gameover">Spillet er slut. Prøv igen!</string>
     <string name="dictionarychosen">Ordbog valgt</string>
     <string name="donedownloading">Færdig.</string>
+    <string name="s132962_hangman_3">s132962 Hangman 3</string>
 </resources>

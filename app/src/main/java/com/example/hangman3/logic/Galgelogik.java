@@ -1,4 +1,4 @@
-package com.example.hangman3.logic.dtuLogic;
+package com.example.hangman3.logic;
 
 import android.util.Log;
 

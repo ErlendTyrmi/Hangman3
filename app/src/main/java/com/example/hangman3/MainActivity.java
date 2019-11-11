@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
         soundPlayer = new SoundPlayer(this.getApplicationContext());
         game = Game.getGame();
-        progressBar = this.findViewById(R.id.progressBar);
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
         gameData = new GameData(game, this.getApplicationContext());
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         game.startRound(); // Round means guessing a single word
         secretWord.setText(game.getShownSecretWord());
 
-        soundPlayer.play("birds");
+        //soundPlayer.play("birds");
 
         // Enter as go-button, keep keyboard up
         enterLetter.setOnEditorActionListener((v, actionId, event) -> {

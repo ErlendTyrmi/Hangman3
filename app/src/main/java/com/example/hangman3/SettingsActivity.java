@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -26,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch switchToHardDTU;
     private TextView loading;
     private ImageButton backbutton;
+    private ProgressBar progressBar2;
     private GameInterface game = Game.getGame();
     private int dictionaryId;
     HashMap<Integer, ArrayList<String>> dictionaries;
@@ -43,6 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
         switchToHardDTU = findViewById(R.id.switchToHardDTU);
         loading = findViewById(R.id.dictionaryLoadingTextView);
         backbutton = findViewById(R.id.backButton);
+        progressBar2 = findViewById(R.id.progressBar2);
 
         int currentDictionaryID = game.getCurrentDictionaryID();
         Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
@@ -118,6 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
         protected void onPreExecute() {
             loading.setVisibility(View.VISIBLE);
             loading.setText(R.string.henter_ordliste);
+            progressBar2.setVisibility(View.VISIBLE);
             backbutton.setEnabled(false);
         }
 
@@ -160,6 +164,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean works) {
+            progressBar2.setVisibility(View.INVISIBLE);
             if (!works) {
                 Toast.makeText(SettingsActivity.this, "Ingen netforbindelse.", Toast.LENGTH_SHORT).show();
                 loading.setText("Download fejlede.");

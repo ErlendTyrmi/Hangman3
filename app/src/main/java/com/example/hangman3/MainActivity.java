@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -62,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
         gameData = new GameData(game, this.getApplicationContext());
+        runGame();
     }
 
     @Override
@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -215,9 +214,6 @@ public class MainActivity extends AppCompatActivity {
             if (!works) {
                 Toast.makeText(getApplicationContext(), "Ingen netforbindelse", Toast.LENGTH_LONG).show();
             }
-            progressBar.setVisibility(View.INVISIBLE);
-            runGame();
-            // Import should happen in background on startup, so default dictionary is enforced.
         }
     }
 

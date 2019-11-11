@@ -24,23 +24,24 @@ public class Game implements GameInterface {
     }
 
     public void importDictionaries() throws Exception {
-        galgelogik = new Galgelogik();
+        // Setting a method local Galgelogik to avoid pollution of ongoing game
+        Galgelogik importGalgelogik = new Galgelogik();
 
         // No network needed for first dictionary.
-        dictionaries.put(0, listClone(galgelogik.muligeOrd));
+        dictionaries.put(0, listClone(importGalgelogik.muligeOrd));
         Log.d(TAG, "importDictionaries: imported dict: 0. First word: " + dictionaries.get(0));
 
 
-        galgelogik.hentOrdFraRegneark("1");
-        dictionaries.put(1, listClone(galgelogik.muligeOrd));
+        importGalgelogik.hentOrdFraRegneark("1");
+        dictionaries.put(1, listClone(importGalgelogik.muligeOrd));
         Log.d(TAG, "importDictionaries: imported dict: 1 (DTU). First word: " + dictionaries.get(1));
 
-        galgelogik.hentOrdFraRegneark("3");
-        dictionaries.put(2, listClone(galgelogik.muligeOrd));
+        importGalgelogik.hentOrdFraRegneark("3");
+        dictionaries.put(2, listClone(importGalgelogik.muligeOrd));
         Log.d(TAG, "importDictionaries: imported dict: 2 (DTU2). First word: " + dictionaries.get(2));
 
-        galgelogik.hentOrdFraDr();
-        dictionaries.put(3, listClone(galgelogik.muligeOrd));
+        importGalgelogik.hentOrdFraDr();
+        dictionaries.put(3, listClone(importGalgelogik.muligeOrd));
         Log.d(TAG, "importDictionaries: imported dict: 3 (DR). First word: " + dictionaries.get(3));
 
         System.out.println("Printing all dictionaries:");

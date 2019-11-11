@@ -131,9 +131,10 @@ public class SettingsActivity extends AppCompatActivity {
             dictionaries = game.getDictionaries();
             boolean allImported = true;
             for (int i = 0; i < 4; i++) {
-                if (dictionaries.get(i) != null && dictionaries.get(i).size() < 1) {
+                if (dictionaries.get(i) == null) {
                     allImported = false;
-
+                } else if (dictionaries.get(i).size() < 1) {
+                    allImported = false;
                 }
             }
             if (!allImported) {

@@ -13,6 +13,7 @@ public class Game implements GameInterface {
 
     private Galgelogik galgelogik = new Galgelogik();
     private int streakCount, highScore, score, currentDictionaryId = 0; // default 0.
+    private String playerName;
     private ArrayList<String> dictionary;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
 
@@ -130,6 +131,14 @@ public class Game implements GameInterface {
     @Override
     public void setHighScore(int newScore) {
         highScore = newScore;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     @Override

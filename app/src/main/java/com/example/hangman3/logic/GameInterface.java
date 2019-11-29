@@ -34,6 +34,10 @@ public interface GameInterface {
 
     void setHighScore(int score);
 
+    String getPlayerName();
+
+    void setPlayerName(String playerName);
+
     int getNumberOfWrongGuesses();
 
     boolean isFinished();

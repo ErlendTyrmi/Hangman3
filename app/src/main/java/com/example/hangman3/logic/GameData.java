@@ -14,11 +14,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class GameData {
     private final String dataFileName = "gameData.txt";
-    private GameInterface game;
     private Context context;
 
-    public GameData(GameInterface game, Context context) {
-        this.game = game;
+    public GameData(Context context) {
         this.context = context;
     }
 
@@ -43,7 +41,6 @@ public class GameData {
 
     public int[] readGameData() {
         int[] data = new int[3];
-        // New thread TODO: Maybe set variables from here? The array does not change.
         try (FileInputStream fileInputStream = context.openFileInput(dataFileName)) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
             String dataString = bufferedReader.readLine();

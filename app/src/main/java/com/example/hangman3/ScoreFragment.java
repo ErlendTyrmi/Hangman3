@@ -2,13 +2,15 @@ package com.example.hangman3;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 public class ScoreFragment extends Fragment {
+
     public ScoreFragment() {
         // Required empty public constructor
     }
@@ -54,9 +56,7 @@ public class ScoreFragment extends Fragment {
         textView.setText(t);
     }
 
-    public void setHighScore(int n){
-        TextView textView = getView().findViewById(R.id.textViewHighScore);
-        String t = Integer.toString(n);
-        textView.setText(t);
+    public void setHighScore(String name, int n) {
+
     }
 }

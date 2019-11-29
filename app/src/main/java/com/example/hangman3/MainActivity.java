@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         game = Game.getGame();
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
-        gameData = new GameData(game, this.getApplicationContext());
+        gameData = new GameData(this.getApplicationContext());
         runGame();
     }
 
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     private void setScoreBoard() {
         scoreBoardFragment.setScore(game.getScore());
         scoreBoardFragment.setStreak(game.getStreakCount());
-        scoreBoardFragment.setHighScore(game.getHighScore());
+        scoreBoardFragment.setHighScore(game.getPlayerName(), game.getHighScore());
     }
 }
 

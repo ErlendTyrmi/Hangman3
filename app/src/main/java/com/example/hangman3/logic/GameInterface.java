@@ -29,11 +29,6 @@ public interface GameInterface {
     // Number of times won in a row
     void setStreakCount(int count);
 
-    // All time high score on local storage
-    int getHighScore();
-
-    void setHighScore(int score);
-
     String getPlayerName();
 
     void setPlayerName(String playerName);
@@ -41,6 +36,8 @@ public interface GameInterface {
     int getNumberOfWrongGuesses();
 
     boolean isFinished();
+
+    boolean isNewHighScore();
 
     boolean isWon();
 
@@ -65,4 +62,8 @@ public interface GameInterface {
     // Update score and return streak count and highscore
     int[] updateScore(boolean win);
 
+    GameData getGameData();
+
+    // Handle Game Data
+    void setGameData(GameData gameData);
 }

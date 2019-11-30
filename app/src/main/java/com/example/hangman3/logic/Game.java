@@ -12,7 +12,9 @@ public class Game implements GameInterface {
     private final String TAG = "Game";
 
     private Galgelogik galgelogik = new Galgelogik();
-    private int streakCount, highScore, score, currentDictionaryId = 0; // default 0.
+
+    private GameData gameData;
+    private int streakCount = 0, score = 0, currentDictionaryId = 0; // default 0.
     private String playerName;
     private ArrayList<String> dictionary;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
@@ -60,11 +62,8 @@ public class Game implements GameInterface {
 
     @Override
     public void setDictionary(int dictionaryId) throws Exception {
-
         Log.d("Game", "Set dictionary called with id " + dictionaryId);
-
         this.currentDictionaryId = dictionaryId;
-
 
         switch (dictionaryId) {
             case 1:
@@ -123,16 +122,6 @@ public class Game implements GameInterface {
         this.streakCount = streakCount;
     }
 
-    @Override
-    public int getHighScore() {
-        return highScore;
-    }
-
-    @Override
-    public void setHighScore(int newScore) {
-        highScore = newScore;
-    }
-
     public String getPlayerName() {
         return playerName;
     }
@@ -145,6 +134,11 @@ public class Game implements GameInterface {
     public boolean isFinished() {
         // Check if round is over
         return galgelogik.getAntalForkerteBogstaver() > 5 || galgelogik.erSpilletVundet();
+    }
+
+    @Override
+    public boolean isNewHighScore() {
+        return gameData.isNewHighScore(score);
     }
 
     @Override
@@ -208,15 +202,24 @@ public class Game implements GameInterface {
     public int[] updateScore(boolean win) {
         if (win) {
             streakCount++;
-            score += galgelogik.getOrdet().length();
-            if (score > highScore) {
-                highScore = score;
+            score += 25 - galgelogik.getOrdet().length();
+            if (gameData.isTopNScore(score)) {
+                Score newScore = new Score(playerName, score);
+                gameData.addHiScore(newScore);
             }
         } else {
             streakCount = 0;
             score = 0;
         }
-        return new int[]{score, streakCount, highScore};
+        return new int[]{score, streakCount};
+    }
+
+    public GameData getGameData() {
+        return gameData;
+    }
+
+    public void setGameData(GameData gameData) {
+        this.gameData = gameData;
     }
 
     private ArrayList<String> listClone(ArrayList<String> list) {

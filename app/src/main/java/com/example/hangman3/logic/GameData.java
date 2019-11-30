@@ -1,68 +1,63 @@
 package com.example.hangman3.logic;
 
-import android.content.Context;
-import android.util.Log;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
+public class GameData implements Serializable {
+    private static final int NumOfHiScores = 5;
+    private int streak = 0;
+    private int currentScore = 0;
+    private ArrayList<Score> hiScores;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class GameData {
-    private final String dataFileName = "gameData.txt";
-    private Context context;
-
-    public GameData(Context context) {
-        this.context = context;
+    public ArrayList<Score> getHiScores() {
+        return hiScores;
     }
 
-    public void storeGameData(int[] data) {
-
-        String input = Arrays
-                .stream(data)
-                .mapToObj(String::valueOf)
-                .reduce((a, b) -> a.concat(",").concat(b))
-                .get();
-
-        Log.d("Storing data", "Data from game, converted to string: " + input);
-
-        // New thread
-        try (FileOutputStream outputStream = context.openFileOutput(
-                dataFileName, MODE_PRIVATE)) {
-            outputStream.write(input.getBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public boolean isNewHighScore(int newScore) {
+        return newScore > hiScores.get(0).getScore();
     }
 
-    public int[] readGameData() {
-        int[] data = new int[3];
-        try (FileInputStream fileInputStream = context.openFileInput(dataFileName)) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-            String dataString = bufferedReader.readLine();
-            String[] dataStringArray = dataString.split(",");
-            data[0] = Integer.parseInt(dataStringArray[0]);
-            data[1] = Integer.parseInt(dataStringArray[1]);
-            data[2] = Integer.parseInt(dataStringArray[2]);
-            Log.d("ReadGameData", "Imported data from file: " + data[0] + ", " + data[1] + " and " + data[2]);
-        } catch (FileNotFoundException f) {
-            Log.e("readGameData", "Could not find a data file.");
-            f.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean isTopNScore(int newScore) {
+        for (Score oldScore : hiScores) {
+            if (newScore > oldScore.getScore()) {
+                return true;
+            }
         }
+        // Else none was found
+        return false;
+    }
 
-        try {
-            // Sleep to return updated data
-            Thread.sleep(1000);
-            Log.d("ReadGameData", "Returning data from file: " + data[0] + ", " + data[1] + " and " + data[2]);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void addHiScore(Score newScore) {
+        // Check if top score first!
+        hiScores.add(newScore);
+        // Shorten the list so only the top "NumOfHiScores" are visible
+        shortenHighScores(NumOfHiScores);
+    }
+
+    public String toString() {
+        int i = 0;
+        StringBuilder sb = new StringBuilder();
+        for (Score s : hiScores) {
+            sb.append(i + s.toString());
         }
-        return data;
+        return sb.toString();
+    }
+
+    private void shortenHighScores(int length) {
+        Collections.sort(hiScores);
+        hiScores.subList(length, hiScores.size()).clear();
+    }
+
+    public int getStreak() {
+        return streak;
+    }
+
+    public int getCurrentScore() {
+        return currentScore;
+    }
+
+    public void setCurrentScore(int currentScore) {
+        this.currentScore = currentScore;
     }
 }

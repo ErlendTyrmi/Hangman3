@@ -3,9 +3,16 @@ package com.example.hangman3.logic;
 import java.sql.Timestamp;
 
 public class Score implements Comparable<Score> {
-    private String name;
-    private int score;
+    private String name = "Player Name";
+    private int score = 0;
     private Timestamp date;
+
+    public Score(String name, int score) {
+        this.name = name;
+        this.score = score;
+        // Timestamp set implicitly
+        date = new Timestamp(System.currentTimeMillis());
+    }
 
     public String getName() {
         return name;

@@ -20,13 +20,15 @@ import androidx.fragment.app.FragmentManager;
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameData;
 import com.example.hangman3.logic.GameInterface;
+import com.example.hangman3.logic.StorageManager;
 import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private GameInterface game;
-    private GameData gameData;
+    private StorageManager storageManager;
     private ImageButton settingsButton;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         game = Game.getGame();
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
-        gameData = new GameData(this.getApplicationContext());
+        storageManager = new StorageManager(this.getApplicationContext());
         runGame();
     }
 
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleEnterLetter() {
-
+        // Get letter from EditText
         String letter = enterLetter.getText().toString().toUpperCase();
         enterLetter.setText(letter);
 
@@ -139,7 +141,12 @@ public class MainActivity extends AppCompatActivity {
     private void showResult() {
         int[] data;
         if (game.isWon()) {
-            Toast.makeText(this, getResources().getString(R.string.correctletter), Toast.LENGTH_LONG).show();
+            if (game.isNewHighScore()) {
+                Toast.makeText(this, R.string.yousethighscore, Toast.LENGTH_LONG).show();
+                // Big Confetti Show Here!
+            } else {
+                Toast.makeText(this, getResources().getString(R.string.correctletter), Toast.LENGTH_LONG).show();
+            }
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
             data = game.updateScore(true);
@@ -151,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             data = game.updateScore(false);
         }
         executor.execute(() -> {
-            gameData.storeGameData(data);
+            exportGameData();
             setScoreBoard();
         });
 
@@ -192,6 +199,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void importGameData() {
+        try {
+            GameData data = storageManager.getGameData();
+            game.setGameData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void exportGameData() {
+        GameData data = game.getGameData();
+        try {
+            storageManager.StoreGameData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setScoreBoard() {
+        scoreBoardFragment.setScore(game.getScore());
+        scoreBoardFragment.setStreak(game.getStreakCount());
+    }
+
     private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {
 
         @Override
@@ -214,19 +246,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Ingen netforbindelse", Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    private void importGameData() {
-        int[] gameData = this.gameData.readGameData();
-        game.setScore(gameData[0]);
-        game.setStreakCount(gameData[1]);
-        game.setHighScore(gameData[2]);
-    }
-
-    private void setScoreBoard() {
-        scoreBoardFragment.setScore(game.getScore());
-        scoreBoardFragment.setStreak(game.getStreakCount());
-        scoreBoardFragment.setHighScore(game.getPlayerName(), game.getHighScore());
     }
 }
 

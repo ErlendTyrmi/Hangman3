@@ -21,9 +21,11 @@ import com.example.hangman3.logic.DataSerializer;
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameData;
 import com.example.hangman3.logic.GameInterface;
+import com.example.hangman3.logic.Score;
 import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
@@ -208,12 +210,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void exportGameData() {
+        // Saves data to disk
         GameData data = game.getGameData();
         try {
             dataSerializer.StoreGameData(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Score> getHiScores() {
+        // This method returns the current high scores list to the ScoreFragment
+        return game.getGameData().getHiScores();
     }
 
     private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {

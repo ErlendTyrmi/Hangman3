@@ -15,13 +15,20 @@ public class GameData implements Serializable {
     }
 
     public boolean isNewHighScore(int newScore) {
-        return newScore > hiScores.get(0).getScore();
+        if (hiScores != null) {
+            return newScore > hiScores.get(0).getScore();
+        } else {
+            return false;
+        }
     }
 
     public boolean isTopNScore(int newScore) {
-        for (Score oldScore : hiScores) {
-            if (newScore > oldScore.getScore()) {
-                return true;
+        if (hiScores != null) {
+
+            for (Score oldScore : hiScores) {
+                if (newScore > oldScore.getScore()) {
+                    return true;
+                }
             }
         }
         // Else none was found
@@ -30,6 +37,9 @@ public class GameData implements Serializable {
 
     public void addHiScore(Score newScore) {
         // Check if top score first!
+        if (hiScores == null) {
+            hiScores = new ArrayList<>();
+        }
         hiScores.add(newScore);
         // Shorten the list so only the top "NumOfHiScores" are visible
         shortenHighScores(NumOfHiScores);
@@ -47,6 +57,10 @@ public class GameData implements Serializable {
     private void shortenHighScores(int length) {
         Collections.sort(hiScores);
         hiScores.subList(length, hiScores.size()).clear();
+    }
+
+    public void setStreak(int streak) {
+        this.streak = streak;
     }
 
     public int getStreak() {

@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class Score implements Comparable<Score> {
     private String name = "Player Name";
-    private int score = 0;
+    private int score;
     private Timestamp date;
 
     public Score(String name, int score) {

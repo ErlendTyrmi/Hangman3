@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -15,8 +14,7 @@ public class ScoreFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
-    public static ScoreFragment newInstance(String param1, String param2) {
+    public static ScoreFragment newInstance() {
         ScoreFragment fragment = new ScoreFragment();
         return fragment;
     }
@@ -44,19 +42,5 @@ public class ScoreFragment extends Fragment {
         super.onAttach(context);
     }
 
-    public void setScore(int n){
-        TextView textView = getView().findViewById(R.id.textViewScore);
-        String t = Integer.toString(n);
-        textView.setText(t);
-    }
-
-    public void setStreak(int n){
-        TextView textView = getView().findViewById(R.id.textViewStreak);
-        String t = Integer.toString(n);
-        textView.setText(t);
-    }
-
-    public void setHighScore(String name, int n) {
-
-    }
+    // Todo: update score from game via MainActivity when this is showed
 }

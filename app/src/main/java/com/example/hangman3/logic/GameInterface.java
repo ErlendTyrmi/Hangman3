@@ -59,9 +59,10 @@ public interface GameInterface {
     // Check if letter is a duplicate entry
     boolean isLetterAlreadyGuessed(String letter);
 
-    // Update score and return streak count and highscore
-    int[] updateScore(boolean win);
+    // Update score
+    void updateScore(boolean win);
 
+    // Return a GameData object for handling in Activity
     GameData getGameData();
 
     // Handle Game Data

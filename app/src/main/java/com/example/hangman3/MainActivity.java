@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,10 +17,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.hangman3.logic.DataSerializer;
 import com.example.hangman3.logic.Game;
 import com.example.hangman3.logic.GameData;
 import com.example.hangman3.logic.GameInterface;
-import com.example.hangman3.logic.StorageManager;
 import com.example.hangman3.logic.ThreadPerTaskExecutor;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private GameInterface game;
-    private StorageManager storageManager;
+    private final String TAG = "MainActivity";
     private ImageButton settingsButton;
     private ImageView gameImage;
     private TextView secretWord, wrongLetters;
@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private ScoreFragment scoreBoardFragment;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
-    private ProgressBar progressBar;
     private SoundPlayer soundPlayer;
+    private DataSerializer dataSerializer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +61,13 @@ public class MainActivity extends AppCompatActivity {
         game = Game.getGame();
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
-        storageManager = new StorageManager(this.getApplicationContext());
+        dataSerializer = new DataSerializer(this.getApplicationContext());
         runGame();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        //runGame();
         resetView();
     }
 
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get saved game data from disk when starting up
         importGameData();
-        setScoreBoard();
+        //setScoreBoard();
         game.startRound(); // Round means guessing a single word
         secretWord.setText(game.getShownSecretWord());
 
@@ -139,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showResult() {
-        int[] data;
         if (game.isWon()) {
             if (game.isNewHighScore()) {
                 Toast.makeText(this, R.string.yousethighscore, Toast.LENGTH_LONG).show();
@@ -149,17 +147,15 @@ public class MainActivity extends AppCompatActivity {
             }
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
-            data = game.updateScore(true);
+            game.updateScore(true);
         } else {
             Toast.makeText(this, getResources().getString(R.string.gameover), Toast.LENGTH_LONG).show();
             secretWord.setText(game.getSecretWord());
-            game.setStreakCount(0);
-            game.setScore(0);
-            data = game.updateScore(false);
+            game.updateScore(false);
         }
         executor.execute(() -> {
             exportGameData();
-            setScoreBoard();
+            //setScoreBoard();
         });
 
         new Handler().postDelayed(this::resetView, 3000);
@@ -201,27 +197,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void importGameData() {
         try {
-            GameData data = storageManager.getGameData();
+            GameData data = dataSerializer.getGameData();
             game.setGameData(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            // If gamedata is missing, create new
+            game.setGameData(new GameData());
+            Log.d(TAG, "importGameData: No gamedata found. Is this the first time running the program?");
+            // e.printStackTrace();
         }
     }
 
     private void exportGameData() {
         GameData data = game.getGameData();
         try {
-            storageManager.StoreGameData(data);
+            dataSerializer.StoreGameData(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void setScoreBoard() {
-        scoreBoardFragment.setScore(game.getScore());
-        scoreBoardFragment.setStreak(game.getStreakCount());
     }
 
     private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {

@@ -34,7 +34,7 @@ public class SoundPlayer {
             mediaPlayer.start();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 public void onCompletion(MediaPlayer mp) {
-                    mp.stop();
+                    mp.reset();
                     mp.release();
                 }
             });

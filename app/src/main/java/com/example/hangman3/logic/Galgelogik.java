@@ -1,7 +1,5 @@
 package com.example.hangman3.logic;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -90,7 +88,7 @@ public class Galgelogik {
         spilletErVundet = false;
         spilletErTabt = false;
         ordet = muligeOrd.get(new Random().nextInt(muligeOrd.size()));
-        Log.d("GALGELOGIK", "Sætter ord: " + ordet);
+        //Log.d("GALGELOGIK", "Sætter ord: " + ordet);
         opdaterSynligtOrd();
     }
 

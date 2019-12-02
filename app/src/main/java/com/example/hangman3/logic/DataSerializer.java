@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class StorageManager {
+public class DataSerializer {
     private final String DataFileName = "GameData.txt";
     private final String HiScoreDataFileName = "HiScores.txt";
     private Context context;
 
-    public StorageManager(Context context) {
+    public DataSerializer(Context context) {
         this.context = context;
     }
 

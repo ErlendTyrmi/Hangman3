@@ -14,7 +14,7 @@ public class Game implements GameInterface {
     private Galgelogik galgelogik = new Galgelogik();
 
     private GameData gameData;
-    private int streakCount = 0, score = 0, currentDictionaryId = 0; // default 0.
+    private int currentDictionaryId = 0; // default 0.
     private String playerName;
     private ArrayList<String> dictionary;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
@@ -99,27 +99,27 @@ public class Game implements GameInterface {
         // Protection against too long words
         do {
             galgelogik.nulstil();
-            System.out.println(galgelogik.muligeOrd);
         } while (galgelogik.getOrdet().length() > 16);
+        Log.d(TAG, "startRound: (For test) Guess the word: " + galgelogik.getOrdet());
     }
 
     @Override
     public int getScore() {
-        return score;
+        return gameData.getCurrentScore();
     }
 
     @Override
     public void setScore(int score) {
-        this.score = score;
+        gameData.setCurrentScore(score);
     }
 
     @Override
     public int getStreakCount() {
-        return streakCount;
+        return gameData.getStreak();
     }
 
     public void setStreakCount(int streakCount) {
-        this.streakCount = streakCount;
+        gameData.setStreak(streakCount);
     }
 
     public String getPlayerName() {
@@ -138,7 +138,7 @@ public class Game implements GameInterface {
 
     @Override
     public boolean isNewHighScore() {
-        return gameData.isNewHighScore(score);
+        return gameData.isNewHighScore(gameData.getCurrentScore());
     }
 
     @Override
@@ -199,19 +199,23 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int[] updateScore(boolean win) {
+    public void updateScore(boolean win) {
         if (win) {
-            streakCount++;
-            score += 25 - galgelogik.getOrdet().length();
+            // Add to streak
+            int streak = gameData.getStreak() + 1;
+            gameData.setStreak(streak);
+            // Add to score (Shorter words give more points)
+            int score = gameData.getCurrentScore() + 25 - galgelogik.getOrdet().length();
+            gameData.setCurrentScore(score);
+
             if (gameData.isTopNScore(score)) {
                 Score newScore = new Score(playerName, score);
                 gameData.addHiScore(newScore);
             }
         } else {
-            streakCount = 0;
-            score = 0;
+            gameData.setStreak(0);
+            gameData.setCurrentScore(0);
         }
-        return new int[]{score, streakCount};
     }
 
     public GameData getGameData() {

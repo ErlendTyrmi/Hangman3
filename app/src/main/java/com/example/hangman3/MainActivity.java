@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -16,30 +15,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hangman3.logic.DataSerializer;
-import com.example.hangman3.logic.Game;
-import com.example.hangman3.logic.GameData;
-import com.example.hangman3.logic.GameInterface;
-import com.example.hangman3.logic.Score;
-import com.example.hangman3.logic.ThreadPerTaskExecutor;
+import com.example.hangman3.model.Game;
+import com.example.hangman3.model.GameData;
+import com.example.hangman3.model.ThreadPerTaskExecutor;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
-    private GameInterface game;
+    HiScoreListAdapter hiScoreListAdapter;
     private final String TAG = "MainActivity";
     private ImageButton settingsButton;
     private ImageView gameImage;
-    private TextView secretWord, wrongLetters;
+    private Game game;
     private EditText enterLetter;
-    private ScoreFragment scoreBoardFragment;
+    private TextView secretWord, wrongLetters, scoreTextView, streakTextView;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
     private SoundPlayer soundPlayer;
-    private DataSerializer dataSerializer;
+    private ScoreFragment scoreFragment;
+    private RecyclerView scoreRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +51,24 @@ public class MainActivity extends AppCompatActivity {
         enterLetter = this.findViewById(R.id.enterLetter);
         wrongLetters = this.findViewById(R.id.wrongLetters);
         settingsButton = this.findViewById(R.id.settingsButton);
-        // Confusing: is not a drawer, but children can be drawers
-        drawerLayoutMain = this.findViewById(R.id.scoreBoardDrawerLayout);
+        drawerLayoutMain = this.findViewById(R.id.mainDrawerLayout);
         executor = new ThreadPerTaskExecutor();
-        // For manipulating views in scoreboard
+        // ScoreFragment
         FragmentManager fm = getSupportFragmentManager();
-        scoreBoardFragment = (ScoreFragment) fm.findFragmentById(R.id.fragmentL);
+        scoreFragment = (ScoreFragment) fm.findFragmentById(R.id.scoreFragment);
+        scoreTextView = findViewById(R.id.textViewScore);
+        streakTextView = findViewById(R.id.textViewStreak);
+        // Scoreboard RecyclerView
+        scoreRecyclerView = findViewById(R.id.hiScoreRecyclerView);
+        scoreRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        scoreRecyclerView.setHasFixedSize(true);
+        hiScoreListAdapter = new HiScoreListAdapter();
+        scoreRecyclerView.setAdapter(hiScoreListAdapter);
+        // Model (and score observer)
         soundPlayer = new SoundPlayer(this.getApplicationContext());
-        game = Game.getGame();
+        game = ViewModelProviders.of(this).get(Game.class);
         // Import dictionaries. Game is started from end of this.
         new DictionaryImporter().execute();
-        dataSerializer = new DataSerializer(this.getApplicationContext());
         runGame();
     }
 
@@ -150,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
             game.updateScore(true);
+            updateScoreBoard();
         } else {
             Toast.makeText(this, getResources().getString(R.string.gameover), Toast.LENGTH_LONG).show();
             secretWord.setText(game.getSecretWord());
@@ -197,38 +203,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateScoreBoard() {
+        GameData data = game.getGameData();
+        hiScoreListAdapter.setHiScores(data.getHiScores());
+        scoreTextView.setText(Integer.toString(data.getCurrentScore()));
+        streakTextView.setText(Integer.toString(data.getStreak()));
+    }
+
     private void importGameData() {
-        try {
-            GameData data = dataSerializer.getGameData();
-            game.setGameData(data);
-        } catch (Exception e) {
-            // If gamedata is missing, create new
-            game.setGameData(new GameData());
-            Log.d(TAG, "importGameData: No gamedata found. Is this the first time running the program?");
-            // e.printStackTrace();
-        }
+        game.importData();
     }
 
     private void exportGameData() {
-        // Saves data to disk
-        GameData data = game.getGameData();
-        try {
-            dataSerializer.StoreGameData(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public ArrayList<Score> getHiScores() {
-        // This method returns the current high scores list to the ScoreFragment
-        return game.getGameData().getHiScores();
+        game.exportData();
     }
 
     private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {
-
-        @Override
-        protected void onPreExecute() {
-        }
 
         @Override
         protected Boolean doInBackground(Void... voids) {

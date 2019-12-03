@@ -1,29 +1,31 @@
-package com.example.hangman3.logic;
+package com.example.hangman3.model;
 
+import android.app.Application;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Game implements GameInterface {
-    private static GameInterface game = null;
+public class Game extends AndroidViewModel {
     private final String TAG = "Game";
-
-    private Galgelogik galgelogik = new Galgelogik();
-
+    private Galgelogik galgelogik;
     private GameData gameData;
+    private DataSerializer dataSerializer;
     private int currentDictionaryId = 0; // default 0.
     private String playerName;
     private ArrayList<String> dictionary;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
 
-    public static GameInterface getGame() {
-        if (game == null) {
-            game = new Game();
-        }
-        return game;
+    public Game(@NonNull Application application) {
+        super(application);
+        dataSerializer = new DataSerializer(application);
+        galgelogik = new Galgelogik();
     }
 
     public void importDictionaries() throws Exception {
@@ -60,7 +62,6 @@ public class Game implements GameInterface {
         return dictionaries;
     }
 
-    @Override
     public void setDictionary(int dictionaryId) throws Exception {
         Log.d("Game", "Set dictionary called with id " + dictionaryId);
         this.currentDictionaryId = dictionaryId;
@@ -94,7 +95,6 @@ public class Game implements GameInterface {
         return currentDictionaryId;
     }
 
-    @Override
     public void startRound() {
         // Protection against too long words
         do {
@@ -103,17 +103,14 @@ public class Game implements GameInterface {
         Log.d(TAG, "startRound: (For test) Guess the word: " + galgelogik.getOrdet());
     }
 
-    @Override
     public int getScore() {
         return gameData.getCurrentScore();
     }
 
-    @Override
     public void setScore(int score) {
         gameData.setCurrentScore(score);
     }
 
-    @Override
     public int getStreakCount() {
         return gameData.getStreak();
     }
@@ -130,30 +127,25 @@ public class Game implements GameInterface {
         this.playerName = playerName;
     }
 
-    @Override
     public boolean isFinished() {
         // Check if round is over
         return galgelogik.getAntalForkerteBogstaver() > 5 || galgelogik.erSpilletVundet();
     }
 
-    @Override
     public boolean isNewHighScore() {
         return gameData.isNewHighScore(gameData.getCurrentScore());
     }
 
-    @Override
     public boolean isWon() {
         // Check if round is won
         return galgelogik.erSpilletVundet();
     }
 
-    @Override
     public boolean validateLetter(String letter) {
         galgelogik.gætBogstav(letter.toLowerCase());
         return galgelogik.erSidsteBogstavKorrekt();
     }
 
-    @Override
     public String getShownSecretWord() {
         String backendWord = galgelogik.getSynligtOrd().replace('*', '_');
         String word = "";
@@ -163,12 +155,10 @@ public class Game implements GameInterface {
         return word.substring(0, word.length() - 1);
     }
 
-    @Override
     public String getSecretWord() {
         return galgelogik.getOrdet();
     }
 
-    @Override
     public String getUsedWrongLetters() {
         List<String> used = galgelogik.getBrugteBogstaver();
         List<String> wrong = new ArrayList<>();
@@ -182,23 +172,19 @@ public class Game implements GameInterface {
         return secretWord.substring(1, secretWord.length() - 1);
     }
 
-    @Override
     public int getNumberOfWrongGuesses() {
         return galgelogik.getAntalForkerteBogstaver();
     }
 
-    @Override
     public boolean isALetter(String letter) {
         String regEx = "[A-ZÆØÅa-zæøå]";
         return Pattern.matches(regEx, letter);
     }
 
-    @Override
     public boolean isLetterAlreadyGuessed(String letter) {
         return galgelogik.getBrugteBogstaver().contains(letter.toLowerCase());
     }
 
-    @Override
     public void updateScore(boolean win) {
         if (win) {
             // Add to streak
@@ -218,16 +204,32 @@ public class Game implements GameInterface {
         }
     }
 
+    public void importData() {
+        try {
+            gameData = dataSerializer.getGameData();
+        } catch (Exception e) {
+            // If gamedata is not created, create new
+            gameData = new GameData();
+            Log.d(TAG, "importGameData: No gamedata found. Is this the first time running the program?");
+            // e.printStackTrace();
+        }
+    }
+
+    public void exportData() {
+        // Saves data to disk
+        try {
+            dataSerializer.StoreGameData(gameData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public GameData getGameData() {
         return gameData;
     }
 
-    public void setGameData(GameData gameData) {
-        this.gameData = gameData;
-    }
-
     private ArrayList<String> listClone(ArrayList<String> list) {
-        // A simple method for cloning arraylists.
+        // A method for cloning ArrayLists.
         ArrayList<String> newList = new ArrayList<>();
         for (String s : list) {
             newList.add(s);

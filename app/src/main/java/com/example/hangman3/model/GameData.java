@@ -1,4 +1,4 @@
-package com.example.hangman3.logic;
+package com.example.hangman3.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ public class GameData implements Serializable {
     private static final int NumOfHiScores = 5;
     private int streak = 0;
     private int currentScore = 0;
-    private ArrayList<Score> hiScores;
+    private ArrayList<Score> hiScores = new ArrayList<>();
 
     public ArrayList<Score> getHiScores() {
         return hiScores;

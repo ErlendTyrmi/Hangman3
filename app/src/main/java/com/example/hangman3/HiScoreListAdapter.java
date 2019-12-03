@@ -1,46 +1,64 @@
 package com.example.hangman3;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hangman3.logic.Score;
+import com.example.hangman3.model.Score;
 
+import java.util.ArrayList;
 import java.util.List;
 
-// Todo find out why vireholder is red?
-public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.ViewHolder> {
-    private List<Score> hiScores;
-    private LayoutInflater layoutInflater;
+public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.ScoreViewHolder> {
+    // https://codinginflow.com/tutorials/android/room-viewmodel-livedata-recyclerview-mvvm/part-6-recyclerview-adapter
 
-    public HiScoreListAdapter(Context context, List<Score> hiScores) {
-        this.layoutInflater = LayoutInflater.from(context);
-        this.hiScores = hiScores;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = layoutInflater.inflate(R.layout.hiscore_recycler_row, parent, false);
-        return new RecyclerView.ViewHolder(view);
-    }
+    private List<Score> scoreList = new ArrayList<>();
 
     @NonNull
     @Override
-    public HiScoreListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+    public ScoreViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View scoreView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.hiscore_recycler_row, parent, false);
+        return new ScoreViewHolder(scoreView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HiScoreListAdapter.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull ScoreViewHolder holder, int position) {
+        Score currentScore = scoreList.get(position);
+        holder.name.setText(currentScore.getName());
+        holder.score.setText(currentScore.getScore());
+        holder.date.setText(currentScore.getDate().toString().substring(0, 10));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        if (scoreList == null) {
+            return 0;
+        }
+        return scoreList.size();
     }
+
+    public void setHiScores(List<Score> scoreList) {
+        this.scoreList = scoreList;
+    }
+
+    class ScoreViewHolder extends RecyclerView.ViewHolder {
+        private TextView name,
+                score,
+                date;
+
+        public ScoreViewHolder(View itemView) {
+            super(itemView);
+            name = itemView.findViewById(R.id.list_name);
+            score = itemView.findViewById(R.id.list_score);
+            date = itemView.findViewById(R.id.list_date);
+        }
+    }
+
+
+
 }

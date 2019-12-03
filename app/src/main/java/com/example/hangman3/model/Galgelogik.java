@@ -1,4 +1,4 @@
-package com.example.hangman3.logic;
+package com.example.hangman3.model;
 
 import java.io.BufferedReader;
 import java.io.IOException;

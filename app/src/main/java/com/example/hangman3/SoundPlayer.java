@@ -3,7 +3,7 @@ package com.example.hangman3;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.example.hangman3.logic.ThreadPerTaskExecutor;
+import com.example.hangman3.model.ThreadPerTaskExecutor;
 
 import java.util.concurrent.Executor;
 

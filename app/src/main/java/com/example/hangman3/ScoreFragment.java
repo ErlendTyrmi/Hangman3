@@ -7,11 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class ScoreFragment extends Fragment {
-    private HiScoreListAdapter hiScoreListAdapter;
 
     public ScoreFragment() {
         // Required empty public constructor
@@ -34,10 +31,9 @@ public class ScoreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_score, container, false);
 
         // Handle RecyclerView
-        RecyclerView recyclerView = getActivity().findViewById(R.id.hiScoreList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        hiScoreListAdapter = new HiScoreListAdapter(this, hiScores); // TODO: How to get hiscores
-        recyclerView.setAdapter(hiScoreListAdapter);
+        //RecyclerView recyclerView = getActivity().findViewById(R.id.scoreFragmentLayout);
+        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
 
         return view;
     }
@@ -51,6 +47,4 @@ public class ScoreFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
     }
-
-    // Todo: update score from game via MainActivity when this is showed
 }

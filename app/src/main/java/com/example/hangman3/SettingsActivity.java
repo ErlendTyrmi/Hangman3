@@ -15,7 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.hangman3.model.Game;
+import com.example.hangman3.model.GameViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView loading;
     private ImageButton backbutton;
     private ProgressBar progressBar2;
-    private Game game;
+    private GameViewModel game;
     private int dictionaryId;
     HashMap<Integer, ArrayList<String>> dictionaries;
     private boolean hardModeSet = false;
@@ -46,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
         loading = findViewById(R.id.dictionaryLoadingTextView);
         backbutton = findViewById(R.id.backButton);
         progressBar2 = findViewById(R.id.progressBar2);
-        game = ViewModelProviders.of(this).get(Game.class);
+        game = ViewModelProviders.of(this).get(GameViewModel.class);
         int currentDictionaryID = game.getCurrentDictionaryID();
         Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
         setDictionaryCheckedOnCreate(currentDictionaryID);

@@ -4,28 +4,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class GameData implements Serializable {
+public class GameDataObject implements Serializable {
     private static final int NumOfHiScores = 5;
     private int streak = 0;
     private int currentScore = 0;
-    private ArrayList<Score> hiScores = new ArrayList<>();
+    private ArrayList<ScoreObject> hiScores = new ArrayList<>();
 
-    public ArrayList<Score> getHiScores() {
+    public ArrayList<ScoreObject> getHiScores() {
         return hiScores;
     }
 
     public boolean isNewHighScore(int newScore) {
-        if (hiScores != null) {
-            return newScore > hiScores.get(0).getScore();
-        } else {
-            return false;
-        }
+        return hiScores.size() == 0 || newScore > hiScores.get(0).getScore();
     }
 
     public boolean isTopNScore(int newScore) {
         if (hiScores != null) {
 
-            for (Score oldScore : hiScores) {
+            for (ScoreObject oldScore : hiScores) {
                 if (newScore > oldScore.getScore()) {
                     return true;
                 }
@@ -35,7 +31,7 @@ public class GameData implements Serializable {
         return false;
     }
 
-    public void addHiScore(Score newScore) {
+    public void addHiScore(ScoreObject newScore) {
         // Check if top score first!
         if (hiScores == null) {
             hiScores = new ArrayList<>();
@@ -48,7 +44,7 @@ public class GameData implements Serializable {
     public String toString() {
         int i = 0;
         StringBuilder sb = new StringBuilder();
-        for (Score s : hiScores) {
+        for (ScoreObject s : hiScores) {
             sb.append(i + s.toString());
         }
         return sb.toString();

@@ -1,6 +1,8 @@
-package com.example.hangman3.model;
+package com.example.hangman3.Repositories;
 
 import android.content.Context;
+
+import com.example.hangman3.model.GameDataObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,8 +11,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class DataSerializer {
-    private final String DataFileName = "GameData.txt";
-    private final String HiScoreDataFileName = "HiScores.txt";
+    //private final String DataFileName = "GameData.txt";
+    private final String HiScoreDataFileName = "HangmanData.txt";
     private Context context;
 
     public DataSerializer(Context context) {
@@ -67,7 +69,7 @@ public class DataSerializer {
     */
     // Handle storage of high scores
 
-    public void StoreGameData(GameData gameData) throws IOException {
+    public void StoreGameData(GameDataObject gameData) throws IOException {
         FileOutputStream fos = context.openFileOutput(HiScoreDataFileName, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(gameData);
@@ -75,10 +77,10 @@ public class DataSerializer {
         fos.close();
     }
 
-    public GameData getGameData() throws IOException, ClassNotFoundException {
+    public GameDataObject getGameData() throws IOException, ClassNotFoundException {
         FileInputStream fis = context.openFileInput(HiScoreDataFileName);
         ObjectInputStream is = new ObjectInputStream(fis);
-        GameData gameData = (GameData) is.readObject();
+        GameDataObject gameData = (GameDataObject) is.readObject();
         is.close();
         fis.close();
         return gameData;

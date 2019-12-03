@@ -6,23 +6,25 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.example.hangman3.Repositories.DataSerializer;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Game extends AndroidViewModel {
-    private final String TAG = "Game";
+public class GameViewModel extends AndroidViewModel {
+    private final String TAG = "GameViewModel";
     private Galgelogik galgelogik;
-    private GameData gameData;
+    private GameDataObject gameData;
     private DataSerializer dataSerializer;
     private int currentDictionaryId = 0; // default 0.
     private String playerName;
     private ArrayList<String> dictionary;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
 
-    public Game(@NonNull Application application) {
+    public GameViewModel(@NonNull Application application) {
         super(application);
         dataSerializer = new DataSerializer(application);
         galgelogik = new Galgelogik();
@@ -63,7 +65,7 @@ public class Game extends AndroidViewModel {
     }
 
     public void setDictionary(int dictionaryId) throws Exception {
-        Log.d("Game", "Set dictionary called with id " + dictionaryId);
+        Log.d("GameViewModel", "Set dictionary called with id " + dictionaryId);
         this.currentDictionaryId = dictionaryId;
 
         switch (dictionaryId) {
@@ -195,7 +197,7 @@ public class Game extends AndroidViewModel {
             gameData.setCurrentScore(score);
 
             if (gameData.isTopNScore(score)) {
-                Score newScore = new Score(playerName, score);
+                ScoreObject newScore = new ScoreObject(playerName, score);
                 gameData.addHiScore(newScore);
             }
         } else {
@@ -209,7 +211,7 @@ public class Game extends AndroidViewModel {
             gameData = dataSerializer.getGameData();
         } catch (Exception e) {
             // If gamedata is not created, create new
-            gameData = new GameData();
+            gameData = new GameDataObject();
             Log.d(TAG, "importGameData: No gamedata found. Is this the first time running the program?");
             // e.printStackTrace();
         }
@@ -224,7 +226,7 @@ public class Game extends AndroidViewModel {
         }
     }
 
-    public GameData getGameData() {
+    public GameDataObject getGameData() {
         return gameData;
     }
 

@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hangman3.model.Score;
+import com.example.hangman3.model.ScoreObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.ScoreViewHolder> {
     // https://codinginflow.com/tutorials/android/room-viewmodel-livedata-recyclerview-mvvm/part-6-recyclerview-adapter
 
-    private List<Score> scoreList = new ArrayList<>();
+    private List<ScoreObject> scoreList = new ArrayList<>();
 
     @NonNull
     @Override
@@ -28,7 +28,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ScoreViewHolder holder, int position) {
-        Score currentScore = scoreList.get(position);
+        ScoreObject currentScore = scoreList.get(position);
         holder.name.setText(currentScore.getName());
         holder.score.setText(currentScore.getScore());
         holder.date.setText(currentScore.getDate().toString().substring(0, 10));
@@ -42,7 +42,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
         return scoreList.size();
     }
 
-    public void setHiScores(List<Score> scoreList) {
+    public void setHiScores(List<ScoreObject> scoreList) {
         this.scoreList = scoreList;
     }
 

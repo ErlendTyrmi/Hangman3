@@ -19,18 +19,18 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hangman3.model.Game;
-import com.example.hangman3.model.GameData;
+import com.example.hangman3.model.GameDataObject;
+import com.example.hangman3.model.GameViewModel;
 import com.example.hangman3.model.ThreadPerTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
     HiScoreListAdapter hiScoreListAdapter;
-    private final String TAG = "MainActivity";
+    private final String TAG = "GameActivity";
     private ImageButton settingsButton;
     private ImageView gameImage;
-    private Game game;
+    private GameViewModel game;
     private EditText enterLetter;
     private TextView secretWord, wrongLetters, scoreTextView, streakTextView;
     private DrawerLayout drawerLayoutMain;
@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
         scoreRecyclerView.setAdapter(hiScoreListAdapter);
         // Model (and score observer)
         soundPlayer = new SoundPlayer(this.getApplicationContext());
-        game = ViewModelProviders.of(this).get(Game.class);
-        // Import dictionaries. Game is started from end of this.
+        game = ViewModelProviders.of(this).get(GameViewModel.class);
+        // Import dictionaries. GameViewModel is started from end of this.
         new DictionaryImporter().execute();
         runGame();
     }
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateScoreBoard() {
-        GameData data = game.getGameData();
+        GameDataObject data = game.getGameData();
         hiScoreListAdapter.setHiScores(data.getHiScores());
         scoreTextView.setText(Integer.toString(data.getCurrentScore()));
         streakTextView.setText(Integer.toString(data.getStreak()));

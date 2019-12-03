@@ -2,12 +2,12 @@ package com.example.hangman3.model;
 
 import java.sql.Timestamp;
 
-public class Score implements Comparable<Score> {
+public class ScoreObject implements Comparable<ScoreObject> {
     private String name = "Player Name";
     private int score;
     private Timestamp date;
 
-    public Score(String name, int score) {
+    public ScoreObject(String name, int score) {
         this.name = name;
         this.score = score;
         // Timestamp set implicitly
@@ -40,11 +40,11 @@ public class Score implements Comparable<Score> {
 
     @Override
     public String toString() {
-        return "Player: " + this.getName() + "\t Score: " + this.getScore() + "\tDate: " + this.getDate();
+        return "Player: " + this.getName() + "\t ScoreObject: " + this.getScore() + "\tDate: " + this.getDate();
     }
 
     @Override
-    public int compareTo(Score s) {
+    public int compareTo(ScoreObject s) {
         return this.getScore() - s.getScore();
     }
 }

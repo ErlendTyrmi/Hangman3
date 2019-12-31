@@ -44,6 +44,9 @@ public class GameDataObject implements Serializable {
     public String toString() {
         int i = 0;
         StringBuilder sb = new StringBuilder();
+        sb.append("Score: " + currentScore);
+        sb.append(" Streak: " + streak);
+
         for (ScoreObject s : hiScores) {
             sb.append(i + s.toString());
         }

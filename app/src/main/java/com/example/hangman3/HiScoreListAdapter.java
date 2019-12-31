@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.ScoreViewHolder> {
-    // https://codinginflow.com/tutorials/android/room-viewmodel-livedata-recyclerview-mvvm/part-6-recyclerview-adapter
+    // Source: https://codinginflow.com/tutorials/android/room-viewmodel-livedata-recyclerview-mvvm/part-6-recyclerview-adapter
 
     private List<ScoreObject> scoreList = new ArrayList<>();
 

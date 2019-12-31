@@ -1,6 +1,7 @@
 package com.example.hangman3.Repositories;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.hangman3.model.GameDataObject;
 
@@ -14,6 +15,7 @@ public class DataSerializer {
     //private final String DataFileName = "GameData.txt";
     private final String HiScoreDataFileName = "HangmanData.txt";
     private Context context;
+    private final String TAG = "DataSerializer";
 
     public DataSerializer(Context context) {
         this.context = context;
@@ -72,6 +74,7 @@ public class DataSerializer {
     public void StoreGameData(GameDataObject gameData) throws IOException {
         FileOutputStream fos = context.openFileOutput(HiScoreDataFileName, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
+        Log.d(TAG, "StoreGameData: Saving " + gameData.toString());
         os.writeObject(gameData);
         os.close();
         fos.close();
@@ -83,6 +86,7 @@ public class DataSerializer {
         GameDataObject gameData = (GameDataObject) is.readObject();
         is.close();
         fis.close();
+        Log.d(TAG, "getGameData: Opened " + gameData.toString());
         return gameData;
     }
 }

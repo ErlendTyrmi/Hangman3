@@ -189,6 +189,7 @@ public class GameViewModel extends AndroidViewModel {
 
     public void updateScore(boolean win) {
         if (win) {
+            Log.d(TAG, "updateScore: Game won.");
             // Add to streak
             int streak = gameData.getStreak() + 1;
             gameData.setStreak(streak);
@@ -197,10 +198,12 @@ public class GameViewModel extends AndroidViewModel {
             gameData.setCurrentScore(score);
 
             if (gameData.isTopNScore(score)) {
+                Log.d(TAG, "updateScore: New high score recorded.");
                 ScoreObject newScore = new ScoreObject(playerName, score);
                 gameData.addHiScore(newScore);
             }
         } else {
+            Log.d(TAG, "updateScore: Game lost.");
             gameData.setStreak(0);
             gameData.setCurrentScore(0);
         }

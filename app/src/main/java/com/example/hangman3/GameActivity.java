@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -64,10 +65,9 @@ public class GameActivity extends AppCompatActivity {
         scoreRecyclerView.setHasFixedSize(true);
         hiScoreListAdapter = new HiScoreListAdapter();
         scoreRecyclerView.setAdapter(hiScoreListAdapter);
-        // Model (and score observer)
+        // Model
         soundPlayer = new SoundPlayer(this.getApplicationContext());
         game = ViewModelProviders.of(this).get(GameViewModel.class);
-        // Import dictionaries. GameViewModel is started from end of this.
         new DictionaryImporter().execute();
         runGame();
     }
@@ -155,15 +155,16 @@ public class GameActivity extends AppCompatActivity {
             gameImage.setImageResource(R.drawable.hangmanwin);
             // Update points and store data
             game.updateScore(true);
-            updateScoreBoard();
         } else {
             Toast.makeText(this, getResources().getString(R.string.gameover), Toast.LENGTH_LONG).show();
             secretWord.setText(game.getSecretWord());
             game.updateScore(false);
         }
+        // Update the score board no matter if you win or lose.
+        updateScoreBoard();
+
         executor.execute(() -> {
             exportGameData();
-            //setScoreBoard();
         });
 
         new Handler().postDelayed(this::resetView, 3000);
@@ -205,9 +206,11 @@ public class GameActivity extends AppCompatActivity {
 
     private void updateScoreBoard() {
         GameDataObject data = game.getGameData();
-        hiScoreListAdapter.setHiScores(data.getHiScores());
         scoreTextView.setText(Integer.toString(data.getCurrentScore()));
         streakTextView.setText(Integer.toString(data.getStreak()));
+
+        Log.d(TAG, "updateScoreBoard: Setting High Score List: " + game.getGameData().getHiScores());
+        hiScoreListAdapter.setHiScores(game.getGameData().getHiScores());
     }
 
     private void importGameData() {

@@ -1,9 +1,10 @@
 package com.example.hangman3.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class ScoreObject implements Comparable<ScoreObject> {
-    private String name = "Player Name";
+public class ScoreObject implements Comparable<ScoreObject>, Serializable {
+    private String name = "Unknown Player";
     private int score;
     private Timestamp date;
 
@@ -15,7 +16,12 @@ public class ScoreObject implements Comparable<ScoreObject> {
     }
 
     public String getName() {
-        return name;
+
+        if (name != null) {
+            return name;
+        } else {
+            return "Unknown Player";
+        }
     }
 
     public void setName(String name) {
@@ -40,7 +46,7 @@ public class ScoreObject implements Comparable<ScoreObject> {
 
     @Override
     public String toString() {
-        return "Player: " + this.getName() + "\t ScoreObject: " + this.getScore() + "\tDate: " + this.getDate();
+        return "Player: " + this.getName() + " Score: " + this.getScore() + " Date: " + this.getDate();
     }
 
     @Override

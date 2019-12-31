@@ -19,16 +19,18 @@ public class GameDataObject implements Serializable {
     }
 
     public boolean isTopNScore(int newScore) {
-        if (hiScores != null) {
+        if (hiScores != null && hiScores.size() > 4) {
 
             for (ScoreObject oldScore : hiScores) {
                 if (newScore > oldScore.getScore()) {
                     return true;
                 }
             }
+            return false;
+        } else {
+            // If no list is found or the list is still shorter than 5:
+            return true;
         }
-        // Else none was found
-        return false;
     }
 
     public void addHiScore(ScoreObject newScore) {
@@ -55,7 +57,9 @@ public class GameDataObject implements Serializable {
 
     private void shortenHighScores(int length) {
         Collections.sort(hiScores);
-        hiScores.subList(length, hiScores.size()).clear();
+        if (hiScores.size() > length) {
+            hiScores.subList(length, hiScores.size()).clear();
+        }
     }
 
     public void setStreak(int streak) {

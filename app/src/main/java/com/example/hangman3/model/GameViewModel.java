@@ -197,8 +197,9 @@ public class GameViewModel extends AndroidViewModel {
             int score = gameData.getCurrentScore() + 25 - galgelogik.getOrdet().length();
             gameData.setCurrentScore(score);
 
+            Log.d(TAG, "updateScore: Checking if is top 5:");
             if (gameData.isTopNScore(score)) {
-                Log.d(TAG, "updateScore: New high score recorded.");
+                Log.d(TAG, "updateScore: The score made the high score list.");
                 ScoreObject newScore = new ScoreObject(playerName, score);
                 gameData.addHiScore(newScore);
             }

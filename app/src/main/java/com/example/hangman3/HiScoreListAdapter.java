@@ -1,5 +1,6 @@
 package com.example.hangman3;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
     // Source: https://codinginflow.com/tutorials/android/room-viewmodel-livedata-recyclerview-mvvm/part-6-recyclerview-adapter
 
     private List<ScoreObject> scoreList = new ArrayList<>();
+    private final String TAG = "HiScoreListAdapter";
 
     @NonNull
     @Override
@@ -28,9 +30,11 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ScoreViewHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder: Scores: " + scoreList);
         ScoreObject currentScore = scoreList.get(position);
+        Log.d(TAG, "onBindViewHolder: Current score: " + currentScore);
         holder.name.setText(currentScore.getName());
-        holder.score.setText(currentScore.getScore());
+        holder.score.setText(Integer.toString(currentScore.getScore()));
         holder.date.setText(currentScore.getDate().toString().substring(0, 10));
     }
 
@@ -44,6 +48,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
 
     public void setHiScores(List<ScoreObject> scoreList) {
         this.scoreList = scoreList;
+        notifyDataSetChanged(); // TODO: Recyclerview updates but does not remove old items
     }
 
     class ScoreViewHolder extends RecyclerView.ViewHolder {
@@ -58,7 +63,6 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
             date = itemView.findViewById(R.id.list_date);
         }
     }
-
 
 
 }

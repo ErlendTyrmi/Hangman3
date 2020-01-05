@@ -188,23 +188,33 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     public void updateScore(boolean win) {
+        int score = gameData.getCurrentScore();
+
         if (win) {
             Log.d(TAG, "updateScore: Game won.");
+
             // Add to streak
             int streak = gameData.getStreak() + 1;
             gameData.setStreak(streak);
+
             // Add to score (Shorter words give more points)
-            int score = gameData.getCurrentScore() + 25 - galgelogik.getOrdet().length();
+            score += 20 - galgelogik.getOrdet().length();
+
             gameData.setCurrentScore(score);
 
-            Log.d(TAG, "updateScore: Checking if is top 5:");
+        } else {
+            // Round is over and score is summed and stored
+            Log.d(TAG, "updateScore: Game lost.");
+
+            // Saving high score
+            Log.d(TAG, "updateScore: Checking if score is top 5:");
             if (gameData.isTopNScore(score)) {
                 Log.d(TAG, "updateScore: The score made the high score list.");
                 ScoreObject newScore = new ScoreObject(playerName, score);
                 gameData.addHiScore(newScore);
             }
-        } else {
-            Log.d(TAG, "updateScore: Game lost.");
+
+            // Resetting score
             gameData.setStreak(0);
             gameData.setCurrentScore(0);
         }

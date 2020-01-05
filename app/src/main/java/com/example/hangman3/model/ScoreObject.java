@@ -51,6 +51,6 @@ public class ScoreObject implements Comparable<ScoreObject>, Serializable {
 
     @Override
     public int compareTo(ScoreObject s) {
-        return this.getScore() - s.getScore();
+        return Integer.compare(s.getScore(), this.getScore());
     }
 }

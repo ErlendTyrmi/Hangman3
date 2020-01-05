@@ -43,7 +43,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_game);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // View elements
@@ -82,7 +82,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Get saved game data from disk when starting up
         importGameData();
-        //setScoreBoard();
+        // TODO update score on start
         game.startRound(); // Round means guessing a single word
         secretWord.setText(game.getShownSecretWord());
 
@@ -161,11 +161,8 @@ public class GameActivity extends AppCompatActivity {
             game.updateScore(false);
         }
         // Update the score board no matter if you win or lose.
+        exportGameData();
         updateScoreBoard();
-
-        executor.execute(() -> {
-            exportGameData();
-        });
 
         new Handler().postDelayed(this::resetView, 3000);
     }
@@ -215,6 +212,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void importGameData() {
         game.importData();
+        // Update from saved data every time
+        updateScoreBoard();
     }
 
     private void exportGameData() {

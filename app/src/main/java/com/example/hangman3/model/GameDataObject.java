@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class GameDataObject implements Serializable {
-    private static final int NumOfHiScores = 5;
+    private static final int NUM_SCORES = 5;
     private int streak = 0;
     private int currentScore = 0;
     private ArrayList<ScoreObject> hiScores = new ArrayList<>();
 
     public ArrayList<ScoreObject> getHiScores() {
+        shortenHighScores(NUM_SCORES); // Sort scores, and make sure it's the right length.
         return hiScores;
     }
 
@@ -19,17 +20,16 @@ public class GameDataObject implements Serializable {
     }
 
     public boolean isTopNScore(int newScore) {
-        if (hiScores != null && hiScores.size() > 4) {
-
+        if (hiScores == null || hiScores.size() < 5) {
+            return true;
+        } else {
             for (ScoreObject oldScore : hiScores) {
                 if (newScore > oldScore.getScore()) {
                     return true;
                 }
             }
+            // Default to false
             return false;
-        } else {
-            // If no list is found or the list is still shorter than 5:
-            return true;
         }
     }
 
@@ -39,8 +39,8 @@ public class GameDataObject implements Serializable {
             hiScores = new ArrayList<>();
         }
         hiScores.add(newScore);
-        // Shorten the list so only the top "NumOfHiScores" are visible
-        shortenHighScores(NumOfHiScores);
+        // Shorten the list so only the top "NUM_SCORES" are visible
+        shortenHighScores(NUM_SCORES);
     }
 
     public String toString() {

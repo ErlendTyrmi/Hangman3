@@ -20,7 +20,7 @@ public class ScoreObject implements Comparable<ScoreObject>, Serializable {
         if (name != null) {
             return name;
         } else {
-            return "Unknown Player";
+            return "Ukendt Spiller";
         }
     }
 

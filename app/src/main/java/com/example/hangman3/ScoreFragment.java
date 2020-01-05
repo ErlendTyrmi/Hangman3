@@ -29,12 +29,6 @@ public class ScoreFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_score, container, false);
-
-        // Handle RecyclerView
-        //RecyclerView recyclerView = getActivity().findViewById(R.id.scoreFragmentLayout);
-        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
         return view;
     }
 

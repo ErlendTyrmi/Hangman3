@@ -16,4 +16,5 @@
     <string name="donedownloading">Færdig.</string>
     <string name="s132962_hangman_3">s132962 Hangman 3</string>
     <string name="yousethighscore">Rigtig. Ny rekord er sat!</string>
+    <string name="enterletter">Indtast et bogstav</string>
 </resources>

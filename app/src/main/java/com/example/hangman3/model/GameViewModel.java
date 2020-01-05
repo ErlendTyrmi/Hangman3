@@ -64,7 +64,7 @@ public class GameViewModel extends AndroidViewModel {
         return dictionaries;
     }
 
-    public void setDictionary(int dictionaryId) throws Exception {
+    public void setDictionary(int dictionaryId) {
         Log.d("GameViewModel", "Set dictionary called with id " + dictionaryId);
         this.currentDictionaryId = dictionaryId;
 
@@ -99,6 +99,7 @@ public class GameViewModel extends AndroidViewModel {
 
     public void startRound() {
         // Protection against too long words
+        Log.d(TAG, "startRound: Current dictionary ID: " + currentDictionaryId);
         do {
             galgelogik.nulstil();
         } while (galgelogik.getOrdet().length() > 16);

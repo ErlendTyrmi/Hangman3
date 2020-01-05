@@ -87,14 +87,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
+        <TextView
             android:id="@+id/enterLetter"
-            style="@style/Widget.AppCompat.AutoCompleteTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="casual"
-            android:hint="Start spil"
+            android:hint="@string/enterletter"
             android:inputType="textCapWords"
             android:maxLength="1"
             android:textAlignment="center"
@@ -106,7 +105,7 @@
             app:layout_constraintTop_toBottomOf="@+id/secretWord" />
 
         <fragment
-            android:id="@+id/fragment"
+            android:id="@+id/keyboardFragment"
             android:name="com.example.hangman3.KeyboardFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment;
 
 public class KeyboardFragment extends Fragment {
 
+    private final String TAG = "KeyboardFragment";
+
     public KeyboardFragment() {
         // Required empty public constructor
     }

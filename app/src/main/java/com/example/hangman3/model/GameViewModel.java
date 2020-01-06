@@ -56,6 +56,7 @@ public class GameViewModel extends AndroidViewModel {
             System.out.println("Dictionary " + i + ": " + dictionaries.get(i).toString());
         }
 
+
         setDictionary(currentDictionaryId);
     }
 

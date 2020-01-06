@@ -47,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
         backbutton = findViewById(R.id.backButton);
         progressBar2 = findViewById(R.id.progressBar2);
         game = ViewModelProviders.of(this).get(GameViewModel.class);
+
         int currentDictionaryID = game.getCurrentDictionaryID();
         Log.d(TAG, "Dictionary chosen: " + currentDictionaryID);
         setDictionaryCheckedOnCreate(currentDictionaryID);

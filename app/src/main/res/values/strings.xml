@@ -17,4 +17,6 @@
     <string name="s132962_hangman_3">s132962 Hangman 3</string>
     <string name="yousethighscore">Rigtig. Ny rekord er sat!</string>
     <string name="enterletter">Indtast et bogstav</string>
+    <string name="tryk_p_en_rekord_du_vil_sl">Tryk på en rekord, du vil slå.</string>
+    <string name="rekorder">Rekorder</string>
 </resources>

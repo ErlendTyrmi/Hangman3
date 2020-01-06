@@ -24,7 +24,7 @@
             android:layout_weight="7"
             android:text="No Name"
             android:textAlignment="textEnd"
-            android:textStyle="bold" />
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/list_score"
@@ -42,8 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="7"
-        android:text="00:00 01/01 1980"
         android:textAlignment="textEnd"
-        android:textColor="#AEAFA9" />
+        android:textColor="#837F7F" />
 
 </LinearLayout>

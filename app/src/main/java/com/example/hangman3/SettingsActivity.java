@@ -170,6 +170,9 @@ public class SettingsActivity extends AppCompatActivity {
             if (!works) {
                 Toast.makeText(SettingsActivity.this, "Ingen netforbindelse.", Toast.LENGTH_SHORT).show();
                 loading.setText("Download fejlede.");
+                // Defaulting to internal dictionary
+                game.setDictionary(0);
+                defaultButton.setChecked(true);
             } else {
                 loading.setText(R.string.donedownloading);
             }

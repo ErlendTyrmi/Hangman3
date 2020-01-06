@@ -35,7 +35,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
         Log.d(TAG, "onBindViewHolder: Current score: " + currentScore);
         holder.name.setText(currentScore.getName());
         holder.score.setText(Integer.toString(currentScore.getScore()));
-        holder.date.setText(currentScore.getDate().toString().substring(0, 10));
+        holder.date.setText(currentScore.getDate().toString().substring(0, 16));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class HiScoreListAdapter extends RecyclerView.Adapter<HiScoreListAdapter.
 
     public void setHiScores(List<ScoreObject> scoreList) {
         this.scoreList = scoreList;
-        notifyDataSetChanged(); // TODO: Recyclerview updates but does not remove old items
+        notifyDataSetChanged();
     }
 
     class ScoreViewHolder extends RecyclerView.ViewHolder {

@@ -85,7 +85,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
-        android:text="Rekorder"
+        android:text="@string/rekorder"
         android:textAlignment="textEnd"
         android:textColor="#000000"
         android:textSize="14sp"

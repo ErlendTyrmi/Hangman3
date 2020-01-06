@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Dictionaries {
+    // Words are stored here but not serialized.
+
     private static Dictionaries dm;
     private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
     private int id = 0; // default 0.

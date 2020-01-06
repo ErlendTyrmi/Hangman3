@@ -30,7 +30,9 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     public void importDictionaries() throws Exception {
-        // Setting a method local Galgelogik to avoid pollution of ongoing game
+        // Saving the dictionaries in ram (singleton).
+
+        // Setting a method local Galgelogik to avoid messing up the current game
         Galgelogik importGalgelogik = new Galgelogik();
 
         // No network needed for first dictionary.

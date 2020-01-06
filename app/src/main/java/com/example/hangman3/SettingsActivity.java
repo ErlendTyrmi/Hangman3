@@ -155,7 +155,7 @@ public class SettingsActivity extends AppCompatActivity {
                 } else if (dictionaryId == 1) {
                     game.setDictionary(1);
                 } else if (dictionaryId == 2) {
-                    // 2 -> 3 because 1 has two difficulty settings
+                    // 2 is 3 because DTU has two difficulty settings
                     game.setDictionary(3);
                 }
             } catch (Exception e) {

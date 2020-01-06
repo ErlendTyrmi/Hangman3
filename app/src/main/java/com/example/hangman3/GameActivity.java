@@ -122,7 +122,6 @@ public class GameActivity extends AppCompatActivity {
 
         // Get saved game data from disk when starting up
         importGameData();
-        // TODO update score on start
         game.startRound(); // Round means guessing a single word
         secretWord.setText(game.getShownSecretWord());
 

@@ -19,15 +19,14 @@ public class GameViewModel extends AndroidViewModel {
     private Galgelogik galgelogik;
     private GameDataObject gameData;
     private DataSerializer dataSerializer;
-    private int currentDictionaryId = 0; // default 0.
+    private Dictionaries dictionaries;
     private String playerName;
-    private ArrayList<String> dictionary;
-    private HashMap<Integer, ArrayList<String>> dictionaries = new HashMap<>();
 
     public GameViewModel(@NonNull Application application) {
         super(application);
         dataSerializer = new DataSerializer(application);
         galgelogik = new Galgelogik();
+        dictionaries = Dictionaries.getDictionaryManager();
     }
 
     public void importDictionaries() throws Exception {
@@ -35,73 +34,74 @@ public class GameViewModel extends AndroidViewModel {
         Galgelogik importGalgelogik = new Galgelogik();
 
         // No network needed for first dictionary.
-        dictionaries.put(0, listClone(importGalgelogik.muligeOrd));
-        Log.d(TAG, "importDictionaries: imported dict: 0. First word: " + dictionaries.get(0));
+        dictionaries.addDictionary(0, listClone(importGalgelogik.muligeOrd));
+        Log.d(TAG, "importDictionaries: imported dict: 0. First word: " + dictionaries.getDictionaries().get(0));
 
 
         importGalgelogik.hentOrdFraRegneark("1");
-        dictionaries.put(1, listClone(importGalgelogik.muligeOrd));
-        Log.d(TAG, "importDictionaries: imported dict: 1 (DTU). First word: " + dictionaries.get(1));
+        dictionaries.addDictionary(1, listClone(importGalgelogik.muligeOrd));
+        Log.d(TAG, "importDictionaries: imported dict: 1 (DTU). First word: " + dictionaries.getDictionaries().get(1));
 
         importGalgelogik.hentOrdFraRegneark("3");
-        dictionaries.put(2, listClone(importGalgelogik.muligeOrd));
-        Log.d(TAG, "importDictionaries: imported dict: 2 (DTU2). First word: " + dictionaries.get(2));
+        dictionaries.addDictionary(2, listClone(importGalgelogik.muligeOrd));
+        Log.d(TAG, "importDictionaries: imported dict: 2 (DTU2). First word: " + dictionaries.getDictionaries().get(2));
 
         importGalgelogik.hentOrdFraDr();
-        dictionaries.put(3, listClone(importGalgelogik.muligeOrd));
-        Log.d(TAG, "importDictionaries: imported dict: 3 (DR). First word: " + dictionaries.get(3));
+        dictionaries.addDictionary(3, listClone(importGalgelogik.muligeOrd));
+        Log.d(TAG, "importDictionaries: imported dict: 3 (DR). First word: " + dictionaries.getDictionaries().get(3));
 
         System.out.println("Printing all dictionaries:");
         for (int i = 0; i < 4; i++) {
-            System.out.println("Dictionary " + i + ": " + dictionaries.get(i).toString());
+            System.out.println("Dictionary " + i + ": " + dictionaries.getDictionaries().get(i).toString());
         }
 
-
-        setDictionary(currentDictionaryId);
+        setDictionary(this.dictionaries.getId());
     }
 
     public HashMap<Integer, ArrayList<String>> getDictionaries() {
         // Used for testing if dictionaries are downloaded properly
-        return dictionaries;
+        return dictionaries.getDictionaries();
     }
 
     public void setDictionary(int dictionaryId) {
         Log.d("GameViewModel", "Set dictionary called with id " + dictionaryId);
-        this.currentDictionaryId = dictionaryId;
+        dictionaries.setId(dictionaryId);
 
         switch (dictionaryId) {
             case 1:
                 // DTU easy
-                dictionary = dictionaries.get(1);
+                dictionaries.getDictionaries().get(1);
                 break;
             case 2:
                 // DTU hard
-                dictionary = dictionaries.get(2);
+                dictionaries.getDictionaries().get(2);
                 break;
             case 3:
                 // DR
-                dictionary = dictionaries.get(3);
+                dictionaries.getDictionaries().get(3);
                 break;
             default:
                 // Default dictionary
-                dictionary = dictionaries.get(0);
+                dictionaries.getDictionaries().get(0);
                 System.out.println("Using the default dictionary.");
         }
 
         // Set dictionary in underlying logic "galgelogik"
-        System.out.println("Setting this dictionary: " + dictionary);
-        galgelogik.muligeOrd = dictionary;
+        System.out.println("Setting this dictionary: " +
+                dictionaries.getDictionaries().get(dictionaryId));
+        galgelogik.muligeOrd = dictionaries.getDictionaries().get(dictionaryId);
         galgelogik.nulstil();
     }
 
     public int getCurrentDictionaryID() {
-        return currentDictionaryId;
+        return dictionaries.getId();
     }
 
     public void startRound() {
         // Protection against too long words
-        Log.d(TAG, "startRound: Current dictionary ID: " + currentDictionaryId);
+        Log.d(TAG, "startRound: Current dictionary ID: " + dictionaries.getId());
         do {
+            galgelogik.muligeOrd = dictionaries.getDictionary();
             galgelogik.nulstil();
         } while (galgelogik.getOrdet().length() > 16);
         Log.d(TAG, "startRound: (For test) Guess the word: " + galgelogik.getOrdet());

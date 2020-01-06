@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,11 +33,12 @@ public class GameActivity extends AppCompatActivity {
     private ImageButton settingsButton;
     private ImageView gameImage;
     private GameViewModel game;
-    private final String[] KEYS = {
+    private final String[] LETTERS = {
             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
             "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
             "u", "v", "w", "x", "y", "z", "æ", "ø", "å"
     };
+    private Button[] keys = new Button[29];
     private TextView secretWord, wrongLetters, scoreTextView, streakTextView;
     private DrawerLayout drawerLayoutMain;
     private Executor executor;
@@ -44,7 +46,6 @@ public class GameActivity extends AppCompatActivity {
     private ScoreFragment scoreFragment;
     private TextView enterLetter;
     private RecyclerView scoreRecyclerView;
-    private KeyboardFragment keyboardFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,37 @@ public class GameActivity extends AppCompatActivity {
         scoreRecyclerView.setHasFixedSize(true);
         hiScoreListAdapter = new HiScoreListAdapter();
         scoreRecyclerView.setAdapter(hiScoreListAdapter);
-        // Keyboard
-        keyboardFragment = (KeyboardFragment) fm.findFragmentById(R.id.keyboardFragment);
+
+        // Defining all 29 keyboard buttons, corresponding to letters
+        keys[0] = findViewById(R.id.button);
+        keys[1] = findViewById(R.id.button2);
+        keys[2] = findViewById(R.id.button3);
+        keys[3] = findViewById(R.id.button4);
+        keys[4] = findViewById(R.id.button5);
+        keys[5] = findViewById(R.id.button6);
+        keys[6] = findViewById(R.id.button7);
+        keys[7] = findViewById(R.id.button8);
+        keys[8] = findViewById(R.id.button9);
+        keys[9] = findViewById(R.id.button10);
+        keys[10] = findViewById(R.id.button11);
+        keys[11] = findViewById(R.id.button12);
+        keys[12] = findViewById(R.id.button13);
+        keys[13] = findViewById(R.id.button14);
+        keys[14] = findViewById(R.id.button15);
+        keys[15] = findViewById(R.id.button16);
+        keys[16] = findViewById(R.id.button17);
+        keys[17] = findViewById(R.id.button18);
+        keys[18] = findViewById(R.id.button19);
+        keys[19] = findViewById(R.id.button20);
+        keys[20] = findViewById(R.id.button21);
+        keys[21] = findViewById(R.id.button22);
+        keys[22] = findViewById(R.id.button23);
+        keys[23] = findViewById(R.id.button24);
+        keys[24] = findViewById(R.id.button25);
+        keys[25] = findViewById(R.id.button26);
+        keys[26] = findViewById(R.id.button27);
+        keys[27] = findViewById(R.id.button28);
+        keys[28] = findViewById(R.id.button29);
 
         // Model
         soundPlayer = new SoundPlayer(this.getApplicationContext());
@@ -88,6 +118,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     protected void runGame() {
+        // Runs once every time the program starts.
 
         // Get saved game data from disk when starting up
         importGameData();
@@ -103,74 +134,25 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void keyClicked(View v) {
-        String key = "";
-        // Giant if-else for ALL keys
-        if (v.getId() == R.id.button) {
-            key = KEYS[0];
-        } else if (v.getId() == R.id.button2) {
-            key = KEYS[1];
-        } else if (v.getId() == R.id.button3) {
-            key = KEYS[2];
-        } else if (v.getId() == R.id.button4) {
-            key = KEYS[3];
-        } else if (v.getId() == R.id.button5) {
-            key = KEYS[4];
-        } else if (v.getId() == R.id.button6) {
-            key = KEYS[5];
-        } else if (v.getId() == R.id.button7) {
-            key = KEYS[6];
-        } else if (v.getId() == R.id.button8) {
-            key = KEYS[7];
-        } else if (v.getId() == R.id.button9) {
-            key = KEYS[8];
-        } else if (v.getId() == R.id.button10) {
-            key = KEYS[9];
-        } else if (v.getId() == R.id.button11) {
-            key = KEYS[10];
-        } else if (v.getId() == R.id.button12) {
-            key = KEYS[11];
-        } else if (v.getId() == R.id.button13) {
-            key = KEYS[12];
-        } else if (v.getId() == R.id.button14) {
-            key = KEYS[13];
-        } else if (v.getId() == R.id.button15) {
-            key = KEYS[14];
-        } else if (v.getId() == R.id.button16) {
-            key = KEYS[15];
-        } else if (v.getId() == R.id.button17) {
-            key = KEYS[16];
-        } else if (v.getId() == R.id.button18) {
-            key = KEYS[17];
-        } else if (v.getId() == R.id.button19) {
-            key = KEYS[18];
-        } else if (v.getId() == R.id.button20) {
-            key = KEYS[19];
-        } else if (v.getId() == R.id.button21) {
-            key = KEYS[20];
-        } else if (v.getId() == R.id.button22) {
-            key = KEYS[21];
-        } else if (v.getId() == R.id.button23) {
-            key = KEYS[22];
-        } else if (v.getId() == R.id.button24) {
-            key = KEYS[23];
-        } else if (v.getId() == R.id.button25) {
-            key = KEYS[24];
-        } else if (v.getId() == R.id.button26) {
-            key = KEYS[25];
-        } else if (v.getId() == R.id.button27) {
-            key = KEYS[26];
-        } else if (v.getId() == R.id.button28) {
-            key = KEYS[27];
-        } else if (v.getId() == R.id.button29) {
-            key = KEYS[28];
-        }
+        // Called on button click. Translates keyboard input to a letter
+        String letter = "";
+        Button key;
 
-        Log.d(TAG, "keyClicked: " + key);
-        handleEnterLetter(key);
+        // The arrays 'keys' and 'LETTERS' have corresponding indexes.
+        for (int i = 0; i < keys.length; i++) {
+            key = keys[i];
+            if (v.getId() == key.getId()) {
+                letter = LETTERS[i];
+                key.setEnabled(false);
+                break; // Stop looking
+            }
+        }
+        Log.d(TAG, "keyClicked: " + letter);
+        handleEnterLetter(letter);
     }
 
     private void handleEnterLetter(String letter) {
-
+        // Handles actions based on the key entered.
         enterLetter.setText(letter.toUpperCase());
 
         if (!game.isALetter(letter)) {
@@ -208,6 +190,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showResult() {
+        // Shows the result on screen and then stores progress.
         if (game.isWon()) {
             if (game.isNewHighScore()) {
                 Toast.makeText(this, R.string.yousethighscore, Toast.LENGTH_LONG).show();
@@ -231,14 +214,21 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void resetView() {
+        // Resets screen after each round (round = guessing one word).
         game.startRound();
         updateImage(game.getNumberOfWrongGuesses());
         wrongLetters.setText(game.getUsedWrongLetters());
         secretWord.setText(game.getShownSecretWord());
         drawerLayoutMain.openDrawer(GravityCompat.START, true);
+
+        // Reset all disabled buttons
+        for (Button b : keys) {
+            b.setEnabled(true);
+        }
     }
 
     private void updateImage(int wrongGuesses) {
+        // Updates the main game image based on progress or result
         switch (wrongGuesses) {
             case 0:
                 gameImage.setImageResource(R.drawable.hangman0);
@@ -274,17 +264,18 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void importGameData() {
+        // Imports data from serialized file and stores as a GameDataObject.
         game.importData();
-        // Update from saved data every time
-        updateScoreBoard();
+        updateScoreBoard(); // Update from saved data every time
     }
 
     private void exportGameData() {
+        // Serialize GameDataObject as a file
         game.exportData();
     }
 
     private class DictionaryImporter extends AsyncTask<Void, Boolean, Boolean> {
-
+        // Imports dictionaries at startup
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {

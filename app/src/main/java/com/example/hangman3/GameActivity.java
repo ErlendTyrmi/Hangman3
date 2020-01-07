@@ -1,6 +1,7 @@
 package com.example.hangman3;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hangman3.model.GameDataObject;
 import com.example.hangman3.model.GameViewModel;
 import com.example.hangman3.model.ThreadPerTaskExecutor;
+import com.github.jinatonic.confetti.CommonConfetti;
 
 import java.util.concurrent.Executor;
 
@@ -153,6 +155,9 @@ public class GameActivity extends AppCompatActivity {
     private void handleEnterLetter(String letter) {
         // Handles actions based on the key entered.
         enterLetter.setText(letter.toUpperCase());
+
+        CommonConfetti.rainingConfetti(findViewById(R.id.confettiContainer), new int[]{Color.BLACK})
+                .infinite();
 
         if (!game.isALetter(letter)) {
             Toast.makeText(this, getResources().getString(R.string.noletter), Toast.LENGTH_SHORT).show();

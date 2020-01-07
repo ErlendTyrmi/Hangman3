@@ -58,6 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
             setDictionary();
         });
 
+        // Toggle on / off hard mode for the DTU dictionary
         switchToHardDTU.setOnClickListener((View v) -> {
             if (switchToHardDTU.isChecked()) {
                 hardModeSet = true;

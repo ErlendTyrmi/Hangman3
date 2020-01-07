@@ -32,19 +32,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/hangmanstart" />
-<!--
-        <ImageButton
-            android:id="@+id/scoreButton"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:background="#DCFFFFFF"
-            android:scaleType="fitCenter"
+
+        <LinearLayout
+            android:id="@+id/confettiContainer"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:background="#B93838"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@mipmap/ic_launcher_round" />
--->
+            app:layout_constraintTop_toBottomOf="@+id/gameImage">
+
+            <com.github.jinatonic.confetti.ConfettiView
+                android:id="@+id/confettiView"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_weight="1"
+                android:background="#880A0A"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent" />
+        </LinearLayout>
+
         <ImageButton
             android:id="@+id/settingsButton"
             android:layout_width="32dp"
@@ -71,7 +80,7 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gameImage" />
+            app:layout_constraintTop_toBottomOf="@+id/confettiContainer" />
 
         <TextView
             android:id="@+id/wrongLetters"

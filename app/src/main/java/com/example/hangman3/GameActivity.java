@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.example.hangman3.model.GameDataObject;
 import com.example.hangman3.model.GameViewModel;
 import com.example.hangman3.model.ThreadPerTaskExecutor;
 import com.github.jinatonic.confetti.CommonConfetti;
+import com.github.jinatonic.confetti.ConfettiView;
 
 import java.util.concurrent.Executor;
 
@@ -48,6 +50,8 @@ public class GameActivity extends AppCompatActivity {
     private ScoreFragment scoreFragment;
     private TextView enterLetter;
     private RecyclerView scoreRecyclerView;
+    private LinearLayout confettiContainer;
+    private ConfettiView confettiView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,10 @@ public class GameActivity extends AppCompatActivity {
         scoreRecyclerView.setHasFixedSize(true);
         hiScoreListAdapter = new HiScoreListAdapter();
         scoreRecyclerView.setAdapter(hiScoreListAdapter);
+        // Confetti
+        confettiContainer = findViewById(R.id.confettiContainer);
+        confettiView = findViewById(R.id.confettiView);
+
 
         // Defining all 29 keyboard buttons, corresponding to letters
         keys[0] = findViewById(R.id.button);
@@ -120,7 +128,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     protected void runGame() {
-        // Runs once every time the program starts.
+        // Runs only once (when the program starts.)
 
         // Get saved game data from disk when starting up
         importGameData();
@@ -195,6 +203,7 @@ public class GameActivity extends AppCompatActivity {
         if (game.isWon()) {
             if (game.isNewHighScore()) {
                 Toast.makeText(this, R.string.yousethighscore, Toast.LENGTH_LONG).show();
+                confettiContainer.setVisibility(View.VISIBLE);
                 CommonConfetti.rainingConfetti(findViewById(R.id.confettiContainer), new int[]{Color.BLACK})
                         .infinite();
             } else {
@@ -218,6 +227,8 @@ public class GameActivity extends AppCompatActivity {
     private void resetView() {
         // Resets screen after each round (round = guessing one word).
         game.startRound();
+        confettiContainer.setVisibility(View.INVISIBLE); // Hide confetti.
+        confettiView.terminate();
         updateImage(game.getNumberOfWrongGuesses());
         wrongLetters.setText(game.getUsedWrongLetters());
         secretWord.setText(game.getShownSecretWord());

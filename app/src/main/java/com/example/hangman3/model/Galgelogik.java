@@ -24,9 +24,7 @@ public class Galgelogik {
 
     public Galgelogik() {
         muligeOrd.add("bil");
-        // Kommenteret ud af hensyn til test af Erlend
-         /*
-         muligeOrd.add("computer");
+        muligeOrd.add("computer");
         muligeOrd.add("programmering");
         muligeOrd.add("motorvej");
         muligeOrd.add("busrute");
@@ -34,7 +32,6 @@ public class Galgelogik {
         muligeOrd.add("skovsnegl");
         muligeOrd.add("solsort");
         muligeOrd.add("nitten");
-        */
         nulstil();
     }
 

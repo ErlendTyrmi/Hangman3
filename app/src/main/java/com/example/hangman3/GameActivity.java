@@ -304,6 +304,7 @@ public class GameActivity extends AppCompatActivity {
             if (!works) {
                 Toast.makeText(getApplicationContext(), "Ingen netforbindelse", Toast.LENGTH_LONG).show();
             }
+            resetView();
         }
     }
 }

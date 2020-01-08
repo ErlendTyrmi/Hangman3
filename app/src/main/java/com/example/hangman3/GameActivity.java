@@ -156,9 +156,6 @@ public class GameActivity extends AppCompatActivity {
         // Handles actions based on the key entered.
         enterLetter.setText(letter.toUpperCase());
 
-        CommonConfetti.rainingConfetti(findViewById(R.id.confettiContainer), new int[]{Color.BLACK})
-                .infinite();
-
         if (!game.isALetter(letter)) {
             Toast.makeText(this, getResources().getString(R.string.noletter), Toast.LENGTH_SHORT).show();
 
@@ -198,7 +195,8 @@ public class GameActivity extends AppCompatActivity {
         if (game.isWon()) {
             if (game.isNewHighScore()) {
                 Toast.makeText(this, R.string.yousethighscore, Toast.LENGTH_LONG).show();
-                // Big Confetti Show Here!
+                CommonConfetti.rainingConfetti(findViewById(R.id.confettiContainer), new int[]{Color.BLACK})
+                        .infinite();
             } else {
                 Toast.makeText(this, getResources().getString(R.string.correctletter), Toast.LENGTH_LONG).show();
             }
